@@ -4,8 +4,8 @@ const jwt = require('jsonwebtoken');
 // Registrar um novo usuário
 const register = async (req, res) => {
     try {
-        const { usuario, senha } = req.body;
-        const user = new User({ usuario, senha });
+        const { usuario, senha, tipo } = req.body;
+        const user = new User({ usuario, senha, tipo });
         await user.save();
         res.status(201).json({ message: 'Usuário registrado com sucesso!' });
     } catch (error) {
@@ -17,10 +17,8 @@ const register = async (req, res) => {
 const login = async (req, res) => {
     try {
         const { usuario, senha } = req.body;
-        
 
         const user = await User.findOne({ usuario });
-        
 
         if (!user || !(await user.comparePassword(senha))) {
             return res.status(401).json({ message: 'Credenciais inválidas' });

@@ -15,10 +15,8 @@ app.use(express.urlencoded({ extended: true }));
 
 // Rota de login
 app.use('/', authRoutes);
-
 // Middleware para servir arquivos estáticos (imagens)
 app.use('/uploads', express.static('uploads'));
-
 // Usar as rotas de apliques
 app.use('/apliques', apliquesRouter);
 app.use('/lencol-pronta-entrega', lencolProntaEntregaRouter);

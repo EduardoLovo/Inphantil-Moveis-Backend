@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt');
 const userSchema = new mongoose.Schema({
     usuario: { type: String, required: true, unique: true },
     senha: { type: String, required: true },
+    tipo: { type: String, required: true },
 });
 
 // Criptografar a senha antes de salvar
