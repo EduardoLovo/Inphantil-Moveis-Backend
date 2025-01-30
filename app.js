@@ -1,6 +1,7 @@
 const express = require('express');
-const apliquesRouter = require('./routes/apliques.routes.js'); // Importa as rotas de apliques
 const connectToDatabase = require('./config/db.js'); // Importa a função do db.js
+const apliquesRouter = require('./routes/apliques.routes.js'); // Importa as rotas de apliques
+const lencolProntaEntrega = require('./routes/lencolProntaEntrega.routes.js'); // Importa as rotas de apliques
 
 const app = express();
 const port = 3000;
@@ -14,6 +15,7 @@ app.use('/uploads', express.static('uploads'));
 
 // Usar as rotas de apliques
 app.use('/apliques', apliquesRouter);
+app.use('/lencol-pronta-entrega', lencolProntaEntrega);
 
 // Conecta ao banco de dados
 connectToDatabase();

@@ -88,12 +88,6 @@ const createAplique = async (req, res) => {
 const updateAplique = async (req, res) => {
     try {
         const { id } = req.params;
-        // const updates = {
-        //     codigo: req.body.codigo,
-        //     quantidade: req.body.quantidade,
-        //     estoque: req.body.estoque === 'true', // Convertendo para boolean
-        //     ordem: req.body.ordem,
-        // };
 
         // Buscar o aplique atual antes da atualização
         const apliqueAtual = await Apliques.findById(id);
@@ -103,27 +97,32 @@ const updateAplique = async (req, res) => {
 
         // Criar objeto de updates apenas com valores que mudaram
         const updates = {};
+
         if (req.body.codigo && req.body.codigo !== apliqueAtual.codigo) {
             updates.codigo = req.body.codigo;
         }
+
         if (
             req.body.quantidade &&
             parseInt(req.body.quantidade, 10) !== apliqueAtual.quantidade
         ) {
             updates.quantidade = parseInt(req.body.quantidade, 10);
         }
+
         if (req.body.estoque !== undefined) {
             const estoqueBoolean = req.body.estoque === 'true';
             if (estoqueBoolean !== apliqueAtual.estoque) {
                 updates.estoque = estoqueBoolean;
             }
         }
+
         if (
             req.body.ordem &&
             parseInt(req.body.ordem, 10) !== apliqueAtual.ordem
         ) {
             updates.ordem = parseInt(req.body.ordem, 10);
         }
+
         if (req.file) {
             const novaImagem = req.file.path.replace(
                 /^.*[\\\/]uploads[\\\/]/,
@@ -165,6 +164,7 @@ const updateAplique = async (req, res) => {
     }
 };
 
+// Função para deletar um aplique
 const deleteAplique = async (req, res) => {
     try {
         const { id } = req.params; // Obtém o ID do aplique a ser deletado
