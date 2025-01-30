@@ -17,5 +17,9 @@ routes.patch(
     upload.single('imagem'),
     LencolProntaEntregaController.updateLencolProntaEntrega
 );
+routes.delete(
+    '/deleteOne/:id',
+    LencolProntaEntregaController.deleteLencolProntaEntrega
+);
 
 module.exports = routes;

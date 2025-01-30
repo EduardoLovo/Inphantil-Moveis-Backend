@@ -1,60 +1,59 @@
 const fs = require('fs'); // Importa o módulo fs para manipulação de arquivos
 const path = require('path');
 const calcularHashArquivo = require('../config/calcularHash');
-const Apliques = require('../models/Apliques');
+const TecidoParaLencol = require('../models/TecidoParaLencol');
 
-// Função para obter todos os apliques do banco de dados
-const getAllApliques = async (req, res) => {
+// Função para obter todos os tecido do banco de dados
+const getAllTecidoParaLencol = async (req, res) => {
     try {
-        const apliques = await Apliques.find();
-        res.status(200).json(apliques);
+        const tecidoParaLencol = await TecidoParaLencol.find();
+        res.status(200).json(tecidoParaLencol);
     } catch (error) {
         res.status(500).json({
-            message: 'Erro ao buscar apliques',
+            message: 'Erro ao buscar tecido',
             error: error.message,
         });
     }
 };
 
-// Função para obter um aplique por ID
-const getApliqueById = async (req, res) => {
+// Função para obter um tecido por ID
+const getTecidoParaLencolById = async (req, res) => {
     try {
-        const { id } = req.params; // Obtém o ID do aplique a ser buscado
+        const { id } = req.params; // Obtém o ID do tecido a ser buscado
 
-        // Busca o aplique no banco de dados pelo ID
-        const aplique = await Apliques.findById(id);
+        // Busca o tecido no banco de dados pelo ID
+        const tecidoParaLencol = await TecidoParaLencol.findById(id);
 
-        // Verifica se o aplique foi encontrado
-        if (!aplique) {
-            return res.status(404).json({ message: 'Aplique não encontrado' });
+        // Verifica se o tecido foi encontrado
+        if (!tecidoParaLencol) {
+            return res.status(404).json({ message: 'Tecido não encontrado' });
         }
 
-        // Retorna o aplique encontrado
-        res.status(200).json(aplique);
+        // Retorna o tecido encontrado
+        res.status(200).json(tecidoParaLencol);
     } catch (error) {
         // Em caso de erro, retorna um erro 500 com a mensagem
         res.status(500).json({
-            message: 'Erro ao buscar aplique por ID',
+            message: 'Erro ao buscar tecido por ID',
             error: error.message,
         });
     }
 };
 
-// Função para criar um novo aplique no banco de dados
-const createAplique = async (req, res) => {
+// Função para criar um novo tecido no banco de dados
+const createTecidoParaLencol = async (req, res) => {
     try {
         // Verifica se todos os campos obrigatórios foram preenchidos na requisição
         if (
-            !req.body.codigo ||
+            !req.body.cor ||
             !req.file ||
             !req.body.quantidade ||
-            !req.body.estoque ||
-            !req.body.ordem
+            !req.body.estoque
         ) {
             res.send('Preencha todos os campos');
         } else {
             // Extrai os dados do corpo da requisição
-            const { codigo, quantidade, estoque, ordem } = req.body;
+            const { cor, quantidade, estoque } = req.body;
 
             // Obtém o caminho da imagem salva pelo multer, ajustando o caminho para o formato correto
             const imagem = req.file.path.replace(
@@ -62,67 +61,60 @@ const createAplique = async (req, res) => {
                 'uploads/'
             );
 
-            // Cria um novo aplique no banco de dados
-            const novoAplique = await Apliques.create({
-                codigo,
+            // Cria um novo tecido no banco de dados
+            const novoTecidoParaLencol = await TecidoParaLencol.create({
+                cor,
                 imagem,
                 quantidade,
                 estoque,
-                ordem,
             });
 
             // Retorna uma resposta de sucesso
             res.status(201).json({
-                message: 'Aplique adicionado com sucesso',
-                data: novoAplique,
+                message: 'Tecido adicionado com sucesso',
+                data: novoTecidoParaLencol,
             });
         }
     } catch (error) {
         // Em caso de erro, retorna um erro 500 com a mensagem
         res.status(500).json({
-            message: 'Erro ao criar aplique',
+            message: 'Erro ao criar tecido',
             error: error.message,
         });
     }
 };
 
-// Função para atualizar um aplique
-const updateAplique = async (req, res) => {
+// Função para atualizar um tecido
+const updateTecidoParaLencol = async (req, res) => {
     try {
         const { id } = req.params;
 
-        // Buscar o aplique atual antes da atualização
-        const apliqueAtual = await Apliques.findById(id);
-        if (!apliqueAtual) {
-            return res.status(404).json({ message: 'Aplique não encontrado' });
+        // Buscar o tecido atual antes da atualização
+        const tecidoParaLencolAtual = await TecidoParaLencol.findById(id);
+        if (!tecidoParaLencolAtual) {
+            return res.status(404).json({ message: 'Tecido não encontrado' });
         }
 
         // Criar objeto de updates apenas com valores que mudaram
         const updates = {};
 
-        if (req.body.codigo && req.body.codigo !== apliqueAtual.codigo) {
-            updates.codigo = req.body.codigo;
+        if (req.body.cor && req.body.cor !== tecidoParaLencolAtual.cor) {
+            updates.cor = req.body.cor;
         }
 
         if (
             req.body.quantidade &&
-            parseInt(req.body.quantidade, 10) !== apliqueAtual.quantidade
+            parseInt(req.body.quantidade, 10) !==
+                tecidoParaLencolAtual.quantidade
         ) {
             updates.quantidade = parseInt(req.body.quantidade, 10);
         }
 
         if (req.body.estoque !== undefined) {
             const estoqueBoolean = req.body.estoque === 'true';
-            if (estoqueBoolean !== apliqueAtual.estoque) {
+            if (estoqueBoolean !== tecidoParaLencolAtual.estoque) {
                 updates.estoque = estoqueBoolean;
             }
-        }
-
-        if (
-            req.body.ordem &&
-            parseInt(req.body.ordem, 10) !== apliqueAtual.ordem
-        ) {
-            updates.ordem = parseInt(req.body.ordem, 10);
         }
 
         if (req.file) {
@@ -131,7 +123,7 @@ const updateAplique = async (req, res) => {
                 'uploads/'
             );
 
-            const imagemAntiga = apliqueAtual.imagem;
+            const imagemAntiga = tecidoParaLencolAtual.imagem;
 
             // Comparando caminhos absolutos
             const caminhoNovaImagem = path.resolve(novaImagem);
@@ -165,37 +157,36 @@ const updateAplique = async (req, res) => {
                 .json({ message: 'Nenhuma alteração detectada' });
         }
 
-        const apliqueAtualizado = await Apliques.findByIdAndUpdate(
-            id,
-            updates,
-            { new: true }
-        );
+        const tecidoParaLencolAtualizado =
+            await TecidoParaLencol.findByIdAndUpdate(id, updates, {
+                new: true,
+            });
 
         res.status(200).json({
-            message: 'Aplique atualizado com sucesso',
-            data: apliqueAtualizado,
+            message: 'Tecido atualizado com sucesso',
+            data: tecidoParaLencolAtualizado,
         });
     } catch (error) {
         res.status(500).json({
-            message: 'Erro ao atualizar aplique',
+            message: 'Erro ao atualizar tecido',
             error: error.message,
         });
     }
 };
 
-// Função para deletar um aplique
-const deleteAplique = async (req, res) => {
+// Função para deletar um tecido
+const deleteTecidoParaLencol = async (req, res) => {
     try {
-        const { id } = req.params; // Obtém o ID do aplique a ser deletado
+        const { id } = req.params; // Obtém o ID do tecido a ser deletado
 
-        // Verifica se o aplique existe no banco de dados
-        const aplique = await Apliques.findById(id);
-        if (!aplique) {
-            return res.status(404).json({ message: 'Aplique não encontrado' });
+        // Verifica se o tecido existe no banco de dados
+        const tecidoParaLencol = await TecidoParaLencol.findById(id);
+        if (!tecidoParaLencol) {
+            return res.status(404).json({ message: 'Tecido não encontrado' });
         }
 
-        // Obtém o caminho da imagem associada ao aplique
-        const imagemPath = aplique.imagem;
+        // Obtém o caminho da imagem associada ao tecido
+        const imagemPath = tecidoParaLencol.imagem;
 
         // Remove o arquivo de imagem do sistema de arquivos, se existir
         if (imagemPath) {
@@ -208,15 +199,15 @@ const deleteAplique = async (req, res) => {
             });
         }
 
-        // Remove o aplique do banco de dados
-        await Apliques.findByIdAndDelete(id);
+        // Remove o tecido do banco de dados
+        await TecidoParaLencol.findByIdAndDelete(id);
 
         // Retorna uma resposta de sucesso
-        res.status(200).json({ message: 'Aplique deletado com sucesso' });
+        res.status(200).json({ message: 'Tecido deletado com sucesso' });
     } catch (error) {
         // Em caso de erro, retorna um erro 500 com a mensagem
         res.status(500).json({
-            message: 'Erro ao deletar aplique',
+            message: 'Erro ao deletar tecido',
             error: error.message,
         });
     }
@@ -224,9 +215,9 @@ const deleteAplique = async (req, res) => {
 
 // Exporta as funções para serem usadas em outros módulos
 module.exports = {
-    getAllApliques,
-    getApliqueById,
-    createAplique,
-    updateAplique,
-    deleteAplique,
+    getAllTecidoParaLencol,
+    getTecidoParaLencolById,
+    createTecidoParaLencol,
+    updateTecidoParaLencol,
+    deleteTecidoParaLencol,
 };

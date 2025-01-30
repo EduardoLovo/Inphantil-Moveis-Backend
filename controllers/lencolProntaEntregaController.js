@@ -1,4 +1,6 @@
 const fs = require('fs'); // Importa o módulo fs para manipulação de arquivos
+const path = require('path');
+const calcularHashArquivo = require('../config/calcularHash');
 const LencolProntaEntrega = require('../models/LencolProntaEntrega');
 
 // Função para obter todos os lençois do banco de dados
@@ -88,7 +90,6 @@ const createLencolProntaEntrega = async (req, res) => {
 const updateLencolProntaEntrega = async (req, res) => {
     try {
         const { id } = req.params;
-        console.log('2222');
 
         // Buscar o lençol atual antes da atualização
         const lencolProntaEntregaAtual = await LencolProntaEntrega.findById(id);
@@ -99,14 +100,11 @@ const updateLencolProntaEntrega = async (req, res) => {
         // Criar objeto de updates apenas com valores que mudaram
         const updates = {};
 
-        console.log(req.body);
-
         if (
             req.body.codigo &&
             req.body.codigo !== lencolProntaEntregaAtual.codigo
         ) {
             updates.codigo = req.body.codigo;
-            console.log('igual');
         } else {
             ('diferente');
         }
@@ -135,10 +133,27 @@ const updateLencolProntaEntrega = async (req, res) => {
                 /^.*[\\\/]uploads[\\\/]/,
                 'uploads/'
             );
-            if (novaImagem !== lencolProntaEntregaAtual.imagem) {
+
+            const imagemAntiga = lencolProntaEntregaAtual.imagem;
+
+            // Comparando caminhos absolutos
+            const caminhoNovaImagem = path.resolve(novaImagem);
+            const caminhoImagemAntiga = path.resolve(imagemAntiga);
+
+            // Calcular os hashes das imagens
+            const hashNovaImagem = calcularHashArquivo(caminhoNovaImagem);
+            const hashImagemAntiga = calcularHashArquivo(caminhoImagemAntiga);
+
+            if (hashNovaImagem !== hashImagemAntiga) {
                 updates.imagem = novaImagem;
+
+                // Remover a imagem antiga do servidor
+                fs.unlink(imagemAntiga, (err) => {
+                    if (err)
+                        console.error('Erro ao deletar imagem antiga:', err);
+                });
             } else {
-                // Se a imagem é a mesma, removemos o novo arquivo salvo pelo multer
+                // Se a imagem é a mesma, remove a nova imagem enviada
                 fs.unlink(req.file.path, (err) => {
                     if (err)
                         console.error('Erro ao deletar imagem repetida:', err);

@@ -15,8 +15,6 @@ function connectToDatabase() {
             `mongodb+srv://${dbUser}:${dbPass}@cluster0.9qskv.mongodb.net/`,
             {
                 dbName: `Inphantil`,
-                useNewUrlParser: true,
-                useUnifiedTopology: true,
             }
         )
         .then(() => console.log('Conectado ao MongoDB'))
