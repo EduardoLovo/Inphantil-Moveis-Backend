@@ -17,10 +17,10 @@ const register = async (req, res) => {
 const login = async (req, res) => {
     try {
         const { usuario, senha } = req.body;
-        console.log(usuario, senha);
+        
 
         const user = await User.findOne({ usuario });
-        console.log('Usuário encontrado:', user); // Log para depuração
+        
 
         if (!user || !(await user.comparePassword(senha))) {
             return res.status(401).json({ message: 'Credenciais inválidas' });
