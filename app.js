@@ -3,6 +3,7 @@ const connectToDatabase = require('./config/db.js'); // Importa a função do db
 const apliquesRouter = require('./routes/apliques.routes.js'); // Importa as rotas de apliques
 const lencolProntaEntrega = require('./routes/lencolProntaEntrega.routes.js'); // Importa as rotas de apliques
 const tecidoParaLencol = require('./routes/tecidoParaLencol.routes.js');
+const authRoutes = require('./routes/auth.routes.js');
 
 const app = express();
 const port = 3000;
@@ -10,6 +11,9 @@ const port = 3000;
 // Middleware para processar JSON
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Rota de login
+app.use('/', authRoutes);
 
 // Middleware para servir arquivos estáticos (imagens)
 app.use('/uploads', express.static('uploads'));
