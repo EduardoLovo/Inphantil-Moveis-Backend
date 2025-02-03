@@ -2,23 +2,13 @@ const multer = require('multer');
 const path = require('path');
 
 // Configuração do armazenamento
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        // Define a pasta onde as imagens serão salvas
-        cb(null, path.join(__dirname, '../uploads/'));
-    },
-    filename: (req, file, cb) => {
-        // Define o nome do arquivo (usando timestamp para evitar nomes duplicados)
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-        cb(null, uniqueSuffix + path.extname(file.originalname));
-    },
-});
+const storage = multer.memoryStorage(); // Armazena o arquivo na memória como um buffer
 
 // Filtro para aceitar apenas imagens
 const fileFilter = (req, file, cb) => {
     const allowedTypes = /jpeg|jpg|png|gif/;
     const extname = allowedTypes.test(
-        path.extname(file.originalname).toLowerCase()
+        file.originalname.toLowerCase().split('.').pop() // Extrai a extensão do arquivo
     );
     const mimetype = allowedTypes.test(file.mimetype);
 

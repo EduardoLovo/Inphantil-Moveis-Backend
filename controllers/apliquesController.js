@@ -2,6 +2,8 @@ const fs = require('fs'); // Importa o módulo fs para manipulação de arquivos
 const path = require('path');
 const calcularHashArquivo = require('../config/calcularHash');
 const Apliques = require('../models/Apliques');
+const cloudinary = require('../config/cloudinaryConfig'); // Importe o Cloudinary
+const uploadImageToCloudinary = require('../services/cloudinaryService');
 
 // Função para obter todos os apliques do banco de dados
 const getAllApliques = async (req, res) => {
@@ -52,31 +54,38 @@ const createAplique = async (req, res) => {
             !req.body.ordem
         ) {
             res.send('Preencha todos os campos');
-        } else {
-            // Extrai os dados do corpo da requisição
-            const { codigo, quantidade, estoque, ordem } = req.body;
-
-            // Obtém o caminho da imagem salva pelo multer, ajustando o caminho para o formato correto
-            const imagem = req.file.path.replace(
-                /^.*[\\\/]uploads[\\\/]/,
-                'uploads/'
-            );
-
-            // Cria um novo aplique no banco de dados
-            const novoAplique = await Apliques.create({
-                codigo,
-                imagem,
-                quantidade,
-                estoque,
-                ordem,
-            });
-
-            // Retorna uma resposta de sucesso
-            res.status(201).json({
-                message: 'Aplique adicionado com sucesso',
-                data: novoAplique,
-            });
         }
+        // Extrai os dados do corpo da requisição
+        const { codigo, quantidade, estoque, ordem } = req.body;
+
+        // Faz o upload da imagem para o Cloudinary diretamente do buffer
+        const result = await cloudinary.uploader
+            .upload_stream(
+                { resource_type: 'auto' }, // Permite upload de imagens e outros tipos de arquivo
+                async (error, result) => {
+                    if (error) {
+                        throw new Error('Erro ao fazer upload da imagem');
+                    }
+
+                    const imagemUrl = result.secure_url; // URL da imagem no Cloudinary
+
+                    // Cria um novo aplique no banco de dados com a URL da imagem
+                    const novoAplique = await Apliques.create({
+                        codigo,
+                        imagem: imagemUrl, // Usa a URL do Cloudinary
+                        quantidade,
+                        estoque,
+                        ordem,
+                    });
+
+                    // Retorna uma resposta de sucesso
+                    res.status(201).json({
+                        message: 'Aplique adicionado com sucesso',
+                        data: novoAplique,
+                    });
+                }
+            )
+            .end(req.file.buffer); // Envia o buffer da imagem para o Cloudinary
     } catch (error) {
         // Em caso de erro, retorna um erro 500 com a mensagem
         res.status(500).json({
@@ -125,39 +134,31 @@ const updateAplique = async (req, res) => {
             updates.ordem = parseInt(req.body.ordem, 10);
         }
 
-        if (req.file) {
-            const novaImagem = req.file.path.replace(
-                /^.*[\\\/]uploads[\\\/]/,
-                'uploads/'
-            );
+        // Codigo para atualizar imagem (não vou utilizar no momento)
+        // if (req.file) {
+        //     // Faz o upload da nova imagem para o Cloudinary
+        //     const novaImagemUrl = await uploadImageToCloudinary(req.file.path);
 
-            const imagemAntiga = apliqueAtual.imagem;
+        //     // Verifica se a nova imagem é diferente da imagem atual
+        //     if (novaImagemUrl !== apliqueAtual.imagem) {
+        //         updates.imagem = novaImagemUrl;
 
-            // Comparando caminhos absolutos
-            const caminhoNovaImagem = path.resolve(novaImagem);
-            const caminhoImagemAntiga = path.resolve(imagemAntiga);
-
-            // Calcular os hashes das imagens
-            const hashNovaImagem = calcularHashArquivo(caminhoNovaImagem);
-            const hashImagemAntiga = calcularHashArquivo(caminhoImagemAntiga);
-
-            if (hashNovaImagem !== hashImagemAntiga) {
-                updates.imagem = novaImagem;
-
-                // Remover a imagem antiga do servidor
-                fs.unlink(imagemAntiga, (err) => {
-                    if (err)
-                        console.error('Erro ao deletar imagem antiga:', err);
-                });
-            } else {
-                // Se a imagem é a mesma, remove a nova imagem enviada
-                fs.unlink(req.file.path, (err) => {
-                    if (err)
-                        console.error('Erro ao deletar imagem repetida:', err);
-                });
-            }
-        }
-
+        //         // Exclui a imagem antiga do Cloudinary (opcional)
+        //         if (apliqueAtual.imagem) {
+        //             const publicId = apliqueAtual.imagem
+        //                 .split('/')
+        //                 .pop()
+        //                 .split('.')[0];
+        //             await cloudinary.uploader.destroy(publicId); // Exclui a imagem antiga
+        //         }
+        //     } else {
+        //         // Se a imagem é a mesma, remove a nova imagem enviada
+        //         fs.unlink(req.file.path, (err) => {
+        //             if (err)
+        //                 console.error('Erro ao deletar imagem repetida:', err);
+        //         });
+        //     }
+        // }
         // Se nenhum campo foi alterado, retorna sem atualizar
         if (Object.keys(updates).length === 0) {
             return res
@@ -194,18 +195,10 @@ const deleteAplique = async (req, res) => {
             return res.status(404).json({ message: 'Aplique não encontrado' });
         }
 
-        // Obtém o caminho da imagem associada ao aplique
-        const imagemPath = aplique.imagem;
-
-        // Remove o arquivo de imagem do sistema de arquivos, se existir
-        if (imagemPath) {
-            fs.unlink(imagemPath, (err) => {
-                if (err) {
-                    console.error('Erro ao deletar a imagem:', err);
-                } else {
-                    console.log('Imagem deletada com sucesso:', imagemPath);
-                }
-            });
+        // Excluir a imagem do Cloudinary (se existir)
+        if (aplique.imagem) {
+            const publicId = aplique.imagem.split('/').pop().split('.')[0];
+            await cloudinary.uploader.destroy(publicId); // Exclui a imagem do Cloudinary
         }
 
         // Remove o aplique do banco de dados
