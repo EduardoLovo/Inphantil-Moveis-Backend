@@ -17,7 +17,6 @@ routes.post(
 routes.patch(
     '/updateOne/:id',
     authMiddleware,
-    upload.single('imagem'),
     LencolProntaEntregaController.updateLencolProntaEntrega
 );
 routes.delete(

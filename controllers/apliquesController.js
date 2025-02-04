@@ -1,9 +1,5 @@
-const fs = require('fs'); // Importa o módulo fs para manipulação de arquivos
-const path = require('path');
-const calcularHashArquivo = require('../config/calcularHash');
 const Apliques = require('../models/Apliques');
 const cloudinary = require('../config/cloudinaryConfig'); // Importe o Cloudinary
-const uploadImageToCloudinary = require('../services/cloudinaryService');
 
 // Função para obter todos os apliques do banco de dados
 const getAllApliques = async (req, res) => {
@@ -59,7 +55,7 @@ const createAplique = async (req, res) => {
         const { codigo, quantidade, estoque, ordem } = req.body;
 
         // Faz o upload da imagem para o Cloudinary diretamente do buffer
-        const result = await cloudinary.uploader
+        await cloudinary.uploader
             .upload_stream(
                 { resource_type: 'auto' }, // Permite upload de imagens e outros tipos de arquivo
                 async (error, result) => {
@@ -109,6 +105,9 @@ const updateAplique = async (req, res) => {
         // Criar objeto de updates apenas com valores que mudaram
         const updates = {};
 
+        console.log('Requisição recebida:', req.body);
+        console.log('Aplique atual:', apliqueAtual);
+
         if (req.body.codigo && req.body.codigo !== apliqueAtual.codigo) {
             updates.codigo = req.body.codigo;
         }
@@ -134,31 +133,6 @@ const updateAplique = async (req, res) => {
             updates.ordem = parseInt(req.body.ordem, 10);
         }
 
-        // Codigo para atualizar imagem (não vou utilizar no momento)
-        // if (req.file) {
-        //     // Faz o upload da nova imagem para o Cloudinary
-        //     const novaImagemUrl = await uploadImageToCloudinary(req.file.path);
-
-        //     // Verifica se a nova imagem é diferente da imagem atual
-        //     if (novaImagemUrl !== apliqueAtual.imagem) {
-        //         updates.imagem = novaImagemUrl;
-
-        //         // Exclui a imagem antiga do Cloudinary (opcional)
-        //         if (apliqueAtual.imagem) {
-        //             const publicId = apliqueAtual.imagem
-        //                 .split('/')
-        //                 .pop()
-        //                 .split('.')[0];
-        //             await cloudinary.uploader.destroy(publicId); // Exclui a imagem antiga
-        //         }
-        //     } else {
-        //         // Se a imagem é a mesma, remove a nova imagem enviada
-        //         fs.unlink(req.file.path, (err) => {
-        //             if (err)
-        //                 console.error('Erro ao deletar imagem repetida:', err);
-        //         });
-        //     }
-        // }
         // Se nenhum campo foi alterado, retorna sem atualizar
         if (Object.keys(updates).length === 0) {
             return res

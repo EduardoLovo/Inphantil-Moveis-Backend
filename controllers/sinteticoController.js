@@ -53,30 +53,37 @@ const createSintetico = async (req, res) => {
             !req.body.cor
         ) {
             res.send('Preencha todos os campos');
-        } else {
-            // Extrai os dados do corpo da requisição
-            const { codigo, estoque, cor } = req.body;
-
-            // Obtém o caminho da imagem salva pelo multer, ajustando o caminho para o formato correto
-            const imagem = req.file.path.replace(
-                /^.*[\\\/]uploads[\\\/]/,
-                'uploads/'
-            );
-
-            // Cria um novo sintetico no banco de dados
-            const novoSintetico = await Sintetico.create({
-                codigo,
-                imagem,
-                estoque,
-                cor,
-            });
-
-            // Retorna uma resposta de sucesso
-            res.status(201).json({
-                message: 'Sintetico adicionado com sucesso',
-                data: novoSintetico,
-            });
         }
+        // Extrai os dados do corpo da requisição
+        const { codigo, estoque, cor } = req.body;
+
+        // Faz o upload da imagem para o Cloudinary diretamente do buffer
+        await cloudinary.uploader
+            .upload_stream(
+                { resource_type: 'auto' }, // Permite upload de imagens e outros tipos de arquivo
+                async (error, result) => {
+                    if (error) {
+                        throw new Error('Erro ao fazer upload da imagem');
+                    }
+
+                    const imagemUrl = result.secure_url; // URL da imagem no Cloudinary
+
+                    // Cria um novo sintetico no banco de dados com a URL da imagem
+                    const novoSintetico = await Sintetico.create({
+                        codigo,
+                        imagem: imagemUrl, // Usa a URL do Cloudinary
+                        estoque,
+                        cor,
+                    });
+
+                    // Retorna uma resposta de sucesso
+                    res.status(201).json({
+                        message: 'Aplique adicionado com sucesso',
+                        data: novoSintetico,
+                    });
+                }
+            )
+            .end(req.file.buffer); // Envia o buffer da imagem para o Cloudinary
     } catch (error) {
         // Em caso de erro, retorna um erro 500 com a mensagem
         res.status(500).json({
@@ -117,39 +124,6 @@ const updateSintetico = async (req, res) => {
             updates.cor = req.body.cor;
         }
 
-        if (req.file) {
-            const novaImagem = req.file.path.replace(
-                /^.*[\\\/]uploads[\\\/]/,
-                'uploads/'
-            );
-
-            const imagemAntiga = sinteticoAtual.imagem;
-
-            // Comparando caminhos absolutos
-            const caminhoNovaImagem = path.resolve(novaImagem);
-            const caminhoImagemAntiga = path.resolve(imagemAntiga);
-
-            // Calcular os hashes das imagens
-            const hashNovaImagem = calcularHashArquivo(caminhoNovaImagem);
-            const hashImagemAntiga = calcularHashArquivo(caminhoImagemAntiga);
-
-            if (hashNovaImagem !== hashImagemAntiga) {
-                updates.imagem = novaImagem;
-
-                // Remover a imagem antiga do servidor
-                fs.unlink(imagemAntiga, (err) => {
-                    if (err)
-                        console.error('Erro ao deletar imagem antiga:', err);
-                });
-            } else {
-                // Se a imagem é a mesma, remove a nova imagem enviada
-                fs.unlink(req.file.path, (err) => {
-                    if (err)
-                        console.error('Erro ao deletar imagem repetida:', err);
-                });
-            }
-        }
-
         // Se nenhum campo foi alterado, retorna sem atualizar
         if (Object.keys(updates).length === 0) {
             return res
@@ -188,18 +162,10 @@ const deleteSintetico = async (req, res) => {
                 .json({ message: 'Sintetico não encontrado' });
         }
 
-        // Obtém o caminho da imagem associada ao sintetico
-        const imagemPath = sintetico.imagem;
-
-        // Remove o arquivo de imagem do sistema de arquivos, se existir
-        if (imagemPath) {
-            fs.unlink(imagemPath, (err) => {
-                if (err) {
-                    console.error('Erro ao deletar a imagem:', err);
-                } else {
-                    console.log('Imagem deletada com sucesso:', imagemPath);
-                }
-            });
+        // Excluir a imagem do Cloudinary (se existir)
+        if (sintetico.imagem) {
+            const publicId = sintetico.imagem.split('/').pop().split('.')[0];
+            await cloudinary.uploader.destroy(publicId); // Exclui a imagem do Cloudinary
         }
 
         // Remove o sintetico do banco de dados

@@ -14,7 +14,6 @@ routes.post(
 routes.patch(
     '/updateOne/:id',
     authMiddleware,
-    upload.single('imagem'),
     SinteticoController.updateSintetico
 );
 routes.delete(
