@@ -54,6 +54,12 @@ const createAplique = async (req, res) => {
         // Extrai os dados do corpo da requisição
         const { codigo, quantidade, estoque, ordem } = req.body;
 
+        // Verifica se o código já existe no banco
+        const apliqueExistente = await Apliques.findOne({ codigo });
+        if (apliqueExistente) {
+            return res.status(400).json({ message: 'Código já cadastrado' });
+        }
+
         // Faz o upload da imagem para o Cloudinary diretamente do buffer
         await cloudinary.uploader
             .upload_stream(
@@ -105,9 +111,6 @@ const updateAplique = async (req, res) => {
         // Criar objeto de updates apenas com valores que mudaram
         const updates = {};
 
-        console.log('Requisição recebida:', req.body);
-        console.log('Aplique atual:', apliqueAtual);
-
         if (req.body.codigo && req.body.codigo !== apliqueAtual.codigo) {
             updates.codigo = req.body.codigo;
         }
@@ -120,8 +123,12 @@ const updateAplique = async (req, res) => {
         }
 
         if (req.body.estoque !== undefined) {
-            const estoqueBoolean = req.body.estoque === 'true';
-            if (estoqueBoolean !== apliqueAtual.estoque) {
+            const estoqueBoolean =
+                typeof req.body.estoque === 'boolean'
+                    ? req.body.estoque
+                    : req.body.estoque === 'true';
+
+            if (estoqueBoolean !== Boolean(apliqueAtual.estoque)) {
                 updates.estoque = estoqueBoolean;
             }
         }

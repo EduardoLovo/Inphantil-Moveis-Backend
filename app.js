@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 const connectToDatabase = require('./config/db.js'); // Importa a função do db.js
 const apliquesRouter = require('./routes/apliques.routes.js'); // Importa as rotas de apliques
 const lencolProntaEntregaRouter = require('./routes/lencolProntaEntrega.routes.js'); // Importa as rotas de apliques
@@ -9,6 +10,15 @@ const authRoutes = require('./routes/auth.routes.js');
 const app = express();
 const port = 3000;
 
+// Configuração básica do CORS
+app.use(cors());
+app.use(
+    cors({
+        origin: 'http://localhost:3001', // Especifica a origem do frontend
+        methods: ['GET', 'POST', 'PUT', 'DELETE'], // Métodos permitidos
+        allowedHeaders: ['Content-Type', 'Authorization'], // Headers permitidos
+    })
+);
 // Middleware para processar JSON
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
