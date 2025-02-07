@@ -1,5 +1,3 @@
-const fs = require('fs'); // Importa o módulo fs para manipulação de arquivos
-
 const LencolProntaEntrega = require('../models/LencolProntaEntrega');
 const cloudinary = require('../config/cloudinaryConfig'); // Importe o Cloudinary
 

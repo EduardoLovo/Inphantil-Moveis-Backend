@@ -25,12 +25,12 @@ const LencolProntaEntrega = new mongoose.Schema(
         },
         cor: {
             type: String,
-            require: true, // Campo obrigatório
+            required: true, // Campo obrigatório
             trim: true, // Remove espaços no início e no fim
         },
         tamanho: {
             type: String,
-            require: true, // Campo obrigatório
+            required: true, // Campo obrigatório
             trim: true, // Remove espaços no início e no fim
         },
     },

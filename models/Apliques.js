@@ -25,6 +25,7 @@ const ApliquesSchema = new mongoose.Schema(
         },
         estoque: {
             type: Boolean,
+            default: true,
             required: true, // Campo obrigatório
         },
         ordem: {

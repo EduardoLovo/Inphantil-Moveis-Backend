@@ -1,7 +1,5 @@
-const fs = require('fs'); // Importa o módulo fs para manipulação de arquivos
-const path = require('path');
-const calcularHashArquivo = require('../config/calcularHash');
 const Sintetico = require('../models/Sintetico');
+const cloudinary = require('../config/cloudinaryConfig'); // Importe o Cloudinary
 
 // Função para obter todos os sintetico do banco de dados
 const getAllSintetico = async (req, res) => {
@@ -57,6 +55,12 @@ const createSintetico = async (req, res) => {
         // Extrai os dados do corpo da requisição
         const { codigo, estoque, cor } = req.body;
 
+        // Verifica se o código já existe no banco
+        const sinteticoExistente = await Sintetico.findOne({ codigo });
+        if (sinteticoExistente) {
+            return res.status(400).json({ message: 'Código já cadastrado' });
+        }
+
         // Faz o upload da imagem para o Cloudinary diretamente do buffer
         await cloudinary.uploader
             .upload_stream(
@@ -78,7 +82,7 @@ const createSintetico = async (req, res) => {
 
                     // Retorna uma resposta de sucesso
                     res.status(201).json({
-                        message: 'Aplique adicionado com sucesso',
+                        message: 'Sintetico adicionado com sucesso',
                         data: novoSintetico,
                     });
                 }
@@ -114,8 +118,11 @@ const updateSintetico = async (req, res) => {
         }
 
         if (req.body.estoque !== undefined) {
-            const estoqueBoolean = req.body.estoque === 'true';
-            if (estoqueBoolean !== sinteticoAtual.estoque) {
+            const estoqueBoolean =
+                typeof req.body.estoque === 'boolean'
+                    ? req.body.estoque
+                    : req.body.estoque === 'true';
+            if (estoqueBoolean !== Boolean(sinteticoAtual.estoque)) {
                 updates.estoque = estoqueBoolean;
             }
         }

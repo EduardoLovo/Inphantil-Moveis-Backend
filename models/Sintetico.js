@@ -20,11 +20,12 @@ const SinteticoSchema = new mongoose.Schema(
         },
         estoque: {
             type: Boolean,
+            default: true,
             required: true, // Campo obrigatório
         },
         cor: {
             type: String,
-            require: true, // Campo obrigatório
+            required: true, // Campo obrigatório
             trim: true, // Remove espaços no início e no fim
         },
     },

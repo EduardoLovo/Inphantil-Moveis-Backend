@@ -1,7 +1,5 @@
-const fs = require('fs'); // Importa o módulo fs para manipulação de arquivos
-const path = require('path');
-const calcularHashArquivo = require('../config/calcularHash');
 const TecidoParaLencol = require('../models/TecidoParaLencol');
+const cloudinary = require('../config/cloudinaryConfig'); // Importe o Cloudinary
 
 // Função para obter todos os tecido do banco de dados
 const getAllTecidoParaLencol = async (req, res) => {
