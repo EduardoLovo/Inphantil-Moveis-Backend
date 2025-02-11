@@ -5,6 +5,7 @@ const apliquesRouter = require('./routes/apliques.routes.js'); // Importa as rot
 const lencolProntaEntregaRouter = require('./routes/lencolProntaEntrega.routes.js'); // Importa as rotas de apliques
 const tecidoParaLencolRouter = require('./routes/tecidoParaLencol.routes.js');
 const sinteticoRouter = require('./routes/sintetico.routes.js');
+const pantoneRouter = require('./routes/pantone.routes.js');
 const authRoutes = require('./routes/auth.routes.js');
 
 const app = express();
@@ -27,11 +28,12 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/', authRoutes);
 // Middleware para servir arquivos estáticos (imagens)
 app.use('/uploads', express.static('uploads'));
-// Usar as rotas de apliques
+// Totas
 app.use('/aplique', apliquesRouter);
 app.use('/lencol-pronta-entrega', lencolProntaEntregaRouter);
 app.use('/tecido-para-lencol', tecidoParaLencolRouter);
 app.use('/sintetico', sinteticoRouter);
+app.use('/pantone', pantoneRouter);
 
 // Conecta ao banco de dados
 connectToDatabase();
