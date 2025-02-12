@@ -5,7 +5,6 @@ const LencolProntaEntrega = new mongoose.Schema(
         codigo: {
             type: String,
             required: true, // Campo obrigatório
-            unique: true, // Código deve ser único
             trim: true, // Remove espaços no início e no fim
         },
         imagem: {
@@ -26,12 +25,10 @@ const LencolProntaEntrega = new mongoose.Schema(
         cor: {
             type: String,
             required: true, // Campo obrigatório
-            trim: true, // Remove espaços no início e no fim
         },
         tamanho: {
             type: String,
             required: true, // Campo obrigatório
-            trim: true, // Remove espaços no início e no fim
         },
     },
     {

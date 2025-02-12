@@ -109,15 +109,8 @@ const updatePantone = async (req, res) => {
         // Criar objeto de updates apenas com valores que mudaram
         const updates = {};
 
-        if (req.body.codigo && req.body.codigo !== novoPantoneAtual.codigo) {
+        if (req.body.codigo && req.body.codigo !== pantoneAtual.codigo) {
             updates.codigo = req.body.codigo;
-        }
-
-        if (
-            req.body.quantidade &&
-            parseInt(req.body.quantidade, 10) !== pantoneAtual.quantidade
-        ) {
-            updates.quantidade = parseInt(req.body.quantidade, 10);
         }
 
         if (req.body.estoque !== undefined) {
@@ -131,11 +124,8 @@ const updatePantone = async (req, res) => {
             }
         }
 
-        if (
-            req.body.ordem &&
-            parseInt(req.body.ordem, 10) !== pantoneAtual.ordem
-        ) {
-            updates.ordem = parseInt(req.body.ordem, 10);
+        if (req.body.cor && req.body.cor !== pantoneAtual.cor) {
+            updates.cor = req.body.cor;
         }
 
         // Se nenhum campo foi alterado, retorna sem atualizar
