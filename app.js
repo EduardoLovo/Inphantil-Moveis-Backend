@@ -15,7 +15,7 @@ const port = 3000;
 app.use(cors());
 app.use(
     cors({
-        origin: 'http://localhost:3000', // Especifica a origem do frontend
+        origin: 'https://inphantil-moveis-frontend.vercel.app/', // Especifica a origem do frontend
         methods: ['GET', 'POST', 'PUT', 'DELETE'], // Métodos permitidos
         allowedHeaders: ['Content-Type', 'Authorization'], // Headers permitidos
     })
@@ -44,8 +44,8 @@ app.use('/pantone', pantoneRouter);
 connectToDatabase();
 
 // Inicia o servidor e exibe uma mensagem no console com a URL onde ele está rodando
-// app.listen(port, () => {
-//     console.log(`Servidor rodando em http://localhost:${port}`);
-// });
+app.listen(port, () => {
+    console.log(`Servidor rodando em http://localhost:${port}`);
+});
 
 module.exports = app;
