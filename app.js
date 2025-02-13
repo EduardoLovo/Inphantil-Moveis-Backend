@@ -1,12 +1,12 @@
 const express = require('express');
 const cors = require('cors');
-const connectToDatabase = require('./config/db.js'); // Importa a função do db.js
-const apliquesRouter = require('./routes/apliques.routes.js'); // Importa as rotas de apliques
-const lencolProntaEntregaRouter = require('./routes/lencolProntaEntrega.routes.js'); // Importa as rotas de apliques
-const tecidoParaLencolRouter = require('./routes/tecidoParaLencol.routes.js');
-const sinteticoRouter = require('./routes/sintetico.routes.js');
-const pantoneRouter = require('./routes/pantone.routes.js');
-const authRoutes = require('./routes/auth.routes.js');
+const connectToDatabase = require('./src/config/db.js'); // Importa a função do db.js
+const apliquesRouter = require('./src/routes/apliques.routes.js'); // Importa as rotas de apliques
+const lencolProntaEntregaRouter = require('./src/routes/lencolProntaEntrega.routes.js'); // Importa as rotas de apliques
+const tecidoParaLencolRouter = require('./src/routes/tecidoParaLencol.routes.js');
+const sinteticoRouter = require('./src/routes/sintetico.routes.js');
+const pantoneRouter = require('./src/routes/pantone.routes.js');
+const authRoutes = require('./src/routes/auth.routes.js');
 
 const app = express();
 const port = 3000;
