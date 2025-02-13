@@ -24,6 +24,11 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Open Route - Public Route
+app.get('/', (req, res) => {
+    res.status(200).json({ msg: 'Inphantil Moveis API!' });
+});
+
 // Rota de login
 app.use('/', authRoutes);
 // Middleware para servir arquivos estáticos (imagens)
