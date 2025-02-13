@@ -15,7 +15,7 @@ const port = 3000;
 app.use(cors());
 app.use(
     cors({
-        origin: 'http://localhost:3001', // Especifica a origem do frontend
+        origin: 'http://localhost:3000', // Especifica a origem do frontend
         methods: ['GET', 'POST', 'PUT', 'DELETE'], // Métodos permitidos
         allowedHeaders: ['Content-Type', 'Authorization'], // Headers permitidos
     })
