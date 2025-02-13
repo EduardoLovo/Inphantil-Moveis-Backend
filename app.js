@@ -15,7 +15,7 @@ const port = 3000;
 app.use(cors());
 app.use(
     cors({
-        origin: 'https://inphantil-moveis.vercel.app/', // Especifica a origem do frontend
+        origin: 'https://inphantil-moveis.vercel.app', // Especifica a origem do frontend
         methods: ['GET', 'POST', 'PUT', 'DELETE'], // Métodos permitidos
         allowedHeaders: ['Content-Type', 'Authorization'], // Headers permitidos
     })
