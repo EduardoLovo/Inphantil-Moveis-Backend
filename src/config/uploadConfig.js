@@ -1,5 +1,4 @@
 const multer = require('multer');
-const path = require('path');
 
 // Configuração do armazenamento
 const storage = multer.memoryStorage(); // Armazena o arquivo na memória como um buffer

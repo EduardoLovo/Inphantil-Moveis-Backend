@@ -44,6 +44,8 @@ app.use('/pantone', pantoneRouter);
 connectToDatabase();
 
 // Inicia o servidor e exibe uma mensagem no console com a URL onde ele está rodando
-app.listen(port, () => {
-    console.log(`Servidor rodando em http://localhost:${port}`);
-});
+// app.listen(port, () => {
+//     console.log(`Servidor rodando em http://localhost:${port}`);
+// });
+
+module.exports = app;
