@@ -12,20 +12,21 @@ const app = express();
 const port = 3000;
 
 // Configuração básica do CORS
-const allowedOrigins = [
-    'https://inphantil-moveis.vercel.app',
-    'http://localhost:3001',
-];
+// const allowedOrigins = [
+//     'https://inphantil-moveis.vercel.app',
+//     'http://localhost:3001',
+// ];
 // app.use(cors());
 app.use(
     cors({
-        origin: (origin, callback) => {
-            if (!origin || allowedOrigins.includes(origin)) {
-                callback(null, true);
-            } else {
-                callback(new Error('Not allowed by CORS'));
-            }
-        },
+        // origin: (origin, callback) => {
+        //     if (!origin || allowedOrigins.includes(origin)) {
+        //         callback(null, true);
+        //     } else {
+        //         callback(new Error('Not allowed by CORS'));
+        //     }
+        // },
+        origin: 'https://inphantil-moveis.vercel.app',
         methods: ['GET', 'POST', 'PUT', 'DELETE'], // Métodos permitidos
         allowedHeaders: ['Content-Type', 'Authorization'], // Headers permitidos
     })
