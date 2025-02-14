@@ -18,7 +18,7 @@ app.use(
             'http://localhost:3000',
             'http://localhost:3001',
         ],
-        methods: ['GET', 'POST', 'PUT', 'DELETE'], // Métodos permitidos
+        methods: ['GET', 'POST', 'PATCH', 'DELETE'], // Métodos permitidos
         allowedHeaders: ['Content-Type', 'Authorization'], // Headers permitidos
     })
 );
