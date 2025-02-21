@@ -121,7 +121,7 @@ const updateTecidoParaLencol = async (req, res) => {
                     ? req.body.estoque
                     : req.body.estoque === 'true';
 
-            if (estoqueBoolean !== Boolean(apliqueAtual.estoque)) {
+            if (estoqueBoolean !== Boolean(tecidoParaLencolAtual.estoque)) {
                 updates.estoque = estoqueBoolean;
             }
         }
