@@ -116,8 +116,12 @@ const updateTecidoParaLencol = async (req, res) => {
         }
 
         if (req.body.estoque !== undefined) {
-            const estoqueBoolean = req.body.estoque === 'true';
-            if (estoqueBoolean !== tecidoParaLencolAtual.estoque) {
+            const estoqueBoolean =
+                typeof req.body.estoque === 'boolean'
+                    ? req.body.estoque
+                    : req.body.estoque === 'true';
+
+            if (estoqueBoolean !== Boolean(apliqueAtual.estoque)) {
                 updates.estoque = estoqueBoolean;
             }
         }
