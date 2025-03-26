@@ -11,7 +11,7 @@ routes.post(
     upload.single('imagem'),
     ApliqueController.createAplique
 );
-routes.patch('/updateOne/:id', authMiddleware, ApliqueController.updateAplique);
+routes.patch('/updateOne/:id', ApliqueController.updateAplique);
 routes.delete(
     '/deleteOne/:id',
     authMiddleware,

@@ -111,8 +111,14 @@ const updateAplique = async (req, res) => {
         // Criar objeto de updates apenas com valores que mudaram
         const updates = {};
 
+        console.log(req.body);
+
         if (req.body.codigo && req.body.codigo !== apliqueAtual.codigo) {
             updates.codigo = req.body.codigo;
+        }
+        // Verifica se uma nova imagem foi enviada e se é diferente da atual
+        if (req.body.imagem && req.body.imagem !== apliqueAtual.imagem) {
+            updates.imagem = req.body.imagem;
         }
 
         if (
@@ -139,6 +145,8 @@ const updateAplique = async (req, res) => {
         ) {
             updates.ordem = parseInt(req.body.ordem, 10);
         }
+
+        console.log(updates);
 
         // Se nenhum campo foi alterado, retorna sem atualizar
         if (Object.keys(updates).length === 0) {

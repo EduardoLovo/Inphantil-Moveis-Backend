@@ -106,6 +106,12 @@ const updateTecidoParaLencol = async (req, res) => {
         if (req.body.cor && req.body.cor !== tecidoParaLencolAtual.cor) {
             updates.cor = req.body.cor;
         }
+        if (
+            req.body.imagem &&
+            req.body.imagem !== tecidoParaLencolAtual.imagem
+        ) {
+            updates.imagem = req.body.imagem;
+        }
 
         if (
             req.body.quantidade &&
