@@ -113,6 +113,10 @@ const updatePantone = async (req, res) => {
             updates.codigo = req.body.codigo;
         }
 
+        if (req.body.imagem && req.body.imagem !== pantoneAtual.imagem) {
+            updates.imagem = req.body.imagem;
+        }
+
         if (req.body.estoque !== undefined) {
             const estoqueBoolean =
                 typeof req.body.estoque === 'boolean'

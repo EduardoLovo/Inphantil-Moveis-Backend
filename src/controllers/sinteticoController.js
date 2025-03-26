@@ -116,6 +116,9 @@ const updateSintetico = async (req, res) => {
         if (req.body.codigo && req.body.codigo !== sinteticoAtual.codigo) {
             updates.codigo = req.body.codigo;
         }
+        if (req.body.imagem && req.body.imagem !== sinteticoAtual.imagem) {
+            updates.imagem = req.body.imagem;
+        }
 
         if (req.body.estoque !== undefined) {
             const estoqueBoolean =

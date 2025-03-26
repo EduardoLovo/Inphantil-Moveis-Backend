@@ -115,6 +115,13 @@ const updateLencolProntaEntrega = async (req, res) => {
         }
 
         if (
+            req.body.imagem &&
+            req.body.imagem !== lencolProntaEntregaAtual.imagem
+        ) {
+            updates.imagem = req.body.imagem;
+        }
+
+        if (
             req.body.quantidade &&
             parseInt(req.body.quantidade, 10) !==
                 lencolProntaEntregaAtual.quantidade
