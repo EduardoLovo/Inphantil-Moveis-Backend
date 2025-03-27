@@ -11,7 +11,6 @@ routes.get(
 routes.post(
     '/create',
     authMiddleware,
-    upload.single('imagem'),
     LencolProntaEntregaController.createLencolProntaEntrega
 );
 routes.patch(

@@ -1,5 +1,4 @@
 const Pantone = require('../models/Pantone');
-const cloudinary = require('../config/cloudinaryConfig'); // Importe o Cloudinary
 
 // Função para obter todos os pantones do banco de dados
 const getAllPantone = async (req, res) => {
@@ -44,14 +43,14 @@ const createPantone = async (req, res) => {
         // Verifica se todos os campos obrigatórios foram preenchidos na requisição
         if (
             !req.body.codigo ||
-            !req.file ||
+            !req.body.imagem ||
             !req.body.estoque ||
             !req.body.cor
         ) {
             res.send('Preencha todos os campos');
         }
         // Extrai os dados do corpo da requisição
-        const { codigo, estoque, cor } = req.body;
+        const { codigo, imagem, estoque, cor } = req.body;
 
         // Verifica se o código já existe no banco
         const pantoneExistente = await Pantone.findOne({ codigo });
@@ -59,33 +58,19 @@ const createPantone = async (req, res) => {
             return res.status(400).json({ message: 'Código já cadastrado' });
         }
 
-        // Faz o upload da imagem para o Cloudinary diretamente do buffer
-        await cloudinary.uploader
-            .upload_stream(
-                { resource_type: 'auto' }, // Permite upload de imagens e outros tipos de arquivo
-                async (error, result) => {
-                    if (error) {
-                        throw new Error('Erro ao fazer upload da imagem');
-                    }
+        const novoPantone = await Pantone.create({
+            codigo,
+            imagem,
+            quantidade,
+            cor,
+            tamanho,
+        });
 
-                    const imagemUrl = result.secure_url; // URL da imagem no Cloudinary
-
-                    // Cria um novo pantone no banco de dados com a URL da imagem
-                    const novoPantone = await Pantone.create({
-                        codigo,
-                        imagem: imagemUrl, // Usa a URL do Cloudinary
-                        estoque,
-                        cor,
-                    });
-
-                    // Retorna uma resposta de sucesso
-                    res.status(201).json({
-                        message: 'Pantone adicionado com sucesso',
-                        data: novoPantone,
-                    });
-                }
-            )
-            .end(req.file.buffer); // Envia o buffer da imagem para o Cloudinary
+        // Retorna uma resposta de sucesso
+        res.status(201).json({
+            message: 'Pantone adicionado com sucesso',
+            data: novoPantone,
+        });
     } catch (error) {
         // Em caso de erro, retorna um erro 500 com a mensagem
         res.status(500).json({
@@ -164,12 +149,6 @@ const deletePantone = async (req, res) => {
         const pantone = await Pantone.findById(id);
         if (!pantone) {
             return res.status(404).json({ message: 'Pantone não encontrado' });
-        }
-
-        // Excluir a imagem do Cloudinary (se existir)
-        if (pantone.imagem) {
-            const publicId = pantone.imagem.split('/').pop().split('.')[0];
-            await cloudinary.uploader.destroy(publicId); // Exclui a imagem do Cloudinary
         }
 
         // Remove o pantone do banco de dados

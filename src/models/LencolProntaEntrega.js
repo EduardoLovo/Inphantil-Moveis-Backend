@@ -10,12 +10,7 @@ const LencolProntaEntrega = new mongoose.Schema(
         imagem: {
             type: String,
             required: true, // Campo obrigatório
-            validate: {
-                validator: function (v) {
-                    return /^(uploads\/|https?:\/\/)/.test(v); // Valida se é um caminho ou URL válido
-                },
-                message: 'O campo "imagem" deve ser um caminho ou URL válido',
-            },
+           
         },
         quantidade: {
             type: Number,

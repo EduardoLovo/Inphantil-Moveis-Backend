@@ -5,12 +5,7 @@ const authMiddleware = require('../middlewares/authMiddleware');
 
 routes.get('/', SinteticoController.getAllSintetico);
 routes.get('/getById/:id', SinteticoController.getSinteticoById);
-routes.post(
-    '/create',
-    authMiddleware,
-    upload.single('imagem'),
-    SinteticoController.createSintetico
-);
+routes.post('/create', authMiddleware, SinteticoController.createSintetico);
 routes.patch(
     '/updateOne/:id',
     authMiddleware,

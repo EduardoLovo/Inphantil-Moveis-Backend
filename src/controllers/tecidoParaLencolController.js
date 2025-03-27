@@ -44,42 +44,27 @@ const createTecidoParaLencol = async (req, res) => {
         // Verifica se todos os campos obrigatórios foram preenchidos na requisição
         if (
             !req.body.cor ||
-            !req.file ||
+            !req.body.imagem ||
             !req.body.quantidade ||
             !req.body.estoque
         ) {
             res.send('Preencha todos os campos');
         }
         // Extrai os dados do corpo da requisição
-        const { cor, quantidade, estoque } = req.body;
+        const { cor, quantidade, estoque, imagem } = req.body;
 
-        // Faz o upload da imagem para o Cloudinary diretamente do buffer
-        await cloudinary.uploader
-            .upload_stream(
-                { resource_type: 'auto' }, // Permite upload de imagens e outros tipos de arquivo
-                async (error, result) => {
-                    if (error) {
-                        throw new Error('Erro ao fazer upload da imagem');
-                    }
+        const novoTecido = await TecidoParaLencol.create({
+            cor,
+            imagem,
+            quantidade,
+            estoque,
+        });
 
-                    const imagemUrl = result.secure_url; // URL da imagem no Cloudinary
-
-                    // Cria um novo tecido no banco de dados com a URL da imagem
-                    const novoTecido = await TecidoParaLencol.create({
-                        cor,
-                        imagem: imagemUrl, // Usa a URL do Cloudinary
-                        quantidade,
-                        estoque,
-                    });
-
-                    // Retorna uma resposta de sucesso
-                    res.status(201).json({
-                        message: 'Aplique adicionado com sucesso',
-                        data: novoTecido,
-                    });
-                }
-            )
-            .end(req.file.buffer); // Envia o buffer da imagem para o Cloudinary
+        // Retorna uma resposta de sucesso
+        res.status(201).json({
+            message: 'Tecido adicionado com sucesso',
+            data: novoTecido,
+        });
     } catch (error) {
         // Em caso de erro, retorna um erro 500 com a mensagem
         res.status(500).json({
@@ -165,15 +150,6 @@ const deleteTecidoParaLencol = async (req, res) => {
         const tecidoParaLencol = await TecidoParaLencol.findById(id);
         if (!tecidoParaLencol) {
             return res.status(404).json({ message: 'Tecido não encontrado' });
-        }
-
-        // Excluir a imagem do Cloudinary (se existir)
-        if (tecidoParaLencol.imagem) {
-            const publicId = tecidoParaLencol.imagem
-                .split('/')
-                .pop()
-                .split('.')[0];
-            await cloudinary.uploader.destroy(publicId); // Exclui a imagem do Cloudinary
         }
 
         // Remove o tecido do banco de dados

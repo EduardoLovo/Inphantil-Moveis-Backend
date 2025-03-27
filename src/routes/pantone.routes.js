@@ -8,7 +8,6 @@ routes.get('/getById/:id', PantoneController.getPantoneById);
 routes.post(
     '/create',
     authMiddleware,
-    upload.single('imagem'),
     PantoneController.createPantone
 );
 routes.patch('/updateOne/:id', authMiddleware, PantoneController.updatePantone);

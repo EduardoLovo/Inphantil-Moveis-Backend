@@ -8,10 +8,9 @@ routes.get('/getById/:id', ApliqueController.getApliqueById);
 routes.post(
     '/create',
     authMiddleware,
-    upload.single('imagem'),
     ApliqueController.createAplique
 );
-routes.patch('/updateOne/:id', ApliqueController.updateAplique);
+routes.patch('/updateOne/:id', authMiddleware, ApliqueController.updateAplique);
 routes.delete(
     '/deleteOne/:id',
     authMiddleware,

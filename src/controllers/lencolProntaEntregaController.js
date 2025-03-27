@@ -1,5 +1,4 @@
 const LencolProntaEntrega = require('../models/LencolProntaEntrega');
-const cloudinary = require('../config/cloudinaryConfig'); // Importe o Cloudinary
 
 // Função para obter todos os lençois do banco de dados
 const getAllLencolProntaEntrega = async (req, res) => {
@@ -44,7 +43,7 @@ const createLencolProntaEntrega = async (req, res) => {
         // Verifica se todos os campos obrigatórios foram preenchidos na requisição
         if (
             !req.body.codigo ||
-            !req.file ||
+            !req.body.imagem ||
             !req.body.quantidade ||
             !req.body.cor ||
             !req.body.tamanho
@@ -52,36 +51,21 @@ const createLencolProntaEntrega = async (req, res) => {
             res.send('Preencha todos os campos');
         }
         // Extrai os dados do corpo da requisição
-        const { codigo, quantidade, cor, tamanho } = req.body;
+        const { codigo, imagem, quantidade, cor, tamanho } = req.body;
 
-        // Faz o upload da imagem para o Cloudinary diretamente do buffer
-        await cloudinary.uploader
-            .upload_stream(
-                { resource_type: 'auto' }, // Permite upload de imagens e outros tipos de arquivo
-                async (error, result) => {
-                    if (error) {
-                        throw new Error('Erro ao fazer upload da imagem');
-                    }
+        const novoLencol = await LencolProntaEntrega.create({
+            codigo,
+            imagem,
+            quantidade,
+            cor,
+            tamanho,
+        });
 
-                    const imagemUrl = result.secure_url; // URL da imagem no Cloudinary
-
-                    // Cria um novo lençol no banco de dados com a URL da imagem
-                    const novoLencol = await LencolProntaEntrega.create({
-                        codigo,
-                        imagem: imagemUrl, // Usa a URL do Cloudinary
-                        quantidade,
-                        cor,
-                        tamanho,
-                    });
-
-                    // Retorna uma resposta de sucesso
-                    res.status(201).json({
-                        message: 'Lençol adicionado com sucesso',
-                        data: novoLencol,
-                    });
-                }
-            )
-            .end(req.file.buffer); // Envia o buffer da imagem para o Cloudinary
+        // Retorna uma resposta de sucesso
+        res.status(201).json({
+            message: 'Lençol adicionado com sucesso',
+            data: novoLencol,
+        });
     } catch (error) {
         // Em caso de erro, retorna um erro 500 com a mensagem
         res.status(500).json({
@@ -174,15 +158,6 @@ const deleteLencolProntaEntrega = async (req, res) => {
         const lencolProntaEntrega = await LencolProntaEntrega.findById(id);
         if (!lencolProntaEntrega) {
             return res.status(404).json({ message: 'Lençol não encontrado' });
-        }
-
-        // Excluir a imagem do Cloudinary (se existir)
-        if (lencolProntaEntrega.imagem) {
-            const publicId = lencolProntaEntrega.imagem
-                .split('/')
-                .pop()
-                .split('.')[0];
-            await cloudinary.uploader.destroy(publicId); // Exclui a imagem do Cloudinary
         }
 
         // Remove o lençol do banco de dados

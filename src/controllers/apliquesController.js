@@ -1,5 +1,4 @@
 const Apliques = require('../models/Apliques');
-const cloudinary = require('../config/cloudinaryConfig'); // Importe o Cloudinary
 
 // Função para obter todos os apliques do banco de dados
 const getAllApliques = async (req, res) => {
@@ -44,7 +43,7 @@ const createAplique = async (req, res) => {
         // Verifica se todos os campos obrigatórios foram preenchidos na requisição
         if (
             !req.body.codigo ||
-            !req.file ||
+            !req.body.imagem ||
             !req.body.quantidade ||
             !req.body.estoque ||
             !req.body.ordem
@@ -52,7 +51,7 @@ const createAplique = async (req, res) => {
             res.send('Preencha todos os campos');
         }
         // Extrai os dados do corpo da requisição
-        const { codigo, quantidade, estoque, ordem } = req.body;
+        const { codigo, imagem, quantidade, estoque, ordem } = req.body;
 
         // Verifica se o código já existe no banco
         const apliqueExistente = await Apliques.findOne({ codigo });
@@ -60,34 +59,19 @@ const createAplique = async (req, res) => {
             return res.status(400).json({ message: 'Código já cadastrado' });
         }
 
-        // Faz o upload da imagem para o Cloudinary diretamente do buffer
-        await cloudinary.uploader
-            .upload_stream(
-                { resource_type: 'auto' }, // Permite upload de imagens e outros tipos de arquivo
-                async (error, result) => {
-                    if (error) {
-                        throw new Error('Erro ao fazer upload da imagem');
-                    }
+        const novoAplique = await Apliques.create({
+            cor,
+            imagem,
+            quantidade,
+            estoque,
+            ordem,
+        });
 
-                    const imagemUrl = result.secure_url; // URL da imagem no Cloudinary
-
-                    // Cria um novo aplique no banco de dados com a URL da imagem
-                    const novoAplique = await Apliques.create({
-                        codigo,
-                        imagem: imagemUrl, // Usa a URL do Cloudinary
-                        quantidade,
-                        estoque,
-                        ordem,
-                    });
-
-                    // Retorna uma resposta de sucesso
-                    res.status(201).json({
-                        message: 'Aplique adicionado com sucesso',
-                        data: novoAplique,
-                    });
-                }
-            )
-            .end(req.file.buffer); // Envia o buffer da imagem para o Cloudinary
+        // Retorna uma resposta de sucesso
+        res.status(201).json({
+            message: 'Aplique adicionado com sucesso',
+            data: novoAplique,
+        });
     } catch (error) {
         // Em caso de erro, retorna um erro 500 com a mensagem
         res.status(500).json({
@@ -182,12 +166,6 @@ const deleteAplique = async (req, res) => {
         const aplique = await Apliques.findById(id);
         if (!aplique) {
             return res.status(404).json({ message: 'Aplique não encontrado' });
-        }
-
-        // Excluir a imagem do Cloudinary (se existir)
-        if (aplique.imagem) {
-            const publicId = aplique.imagem.split('/').pop().split('.')[0];
-            await cloudinary.uploader.destroy(publicId); // Exclui a imagem do Cloudinary
         }
 
         // Remove o aplique do banco de dados

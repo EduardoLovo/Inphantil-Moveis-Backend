@@ -7,7 +7,6 @@ routes.get('/', TecidoParaLencolController.getAllTecidoParaLencol);
 routes.get('/getById/:id', TecidoParaLencolController.getTecidoParaLencolById);
 routes.post(
     '/create',
-    upload.single('imagem'),
     authMiddleware,
     TecidoParaLencolController.createTecidoParaLencol
 );
