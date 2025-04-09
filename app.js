@@ -22,6 +22,8 @@ app.use(
         allowedHeaders: ['Content-Type', 'Authorization'], // Headers permitidos
     })
 );
+// Adiciona o handler para OPTIONS antes de qualquer rota
+app.options('*', cors());
 // Middleware para processar JSON
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

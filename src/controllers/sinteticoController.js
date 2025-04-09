@@ -49,8 +49,11 @@ const createSintetico = async (req, res) => {
             !req.body.estoque ||
             !req.body.cor
         ) {
-            res.send('Preencha todos os campos');
+            return res
+                .status(400)
+                .json({ message: 'Preencha todos os campos' });
         }
+
         // Extrai os dados do corpo da requisição
         const { codigo, imagem, estoque, cor } = req.body;
 
@@ -61,7 +64,7 @@ const createSintetico = async (req, res) => {
         }
 
         const novoSintetico = await Sintetico.create({
-            cor,
+            codigo,
             imagem,
             estoque,
             cor,
