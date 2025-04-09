@@ -48,7 +48,9 @@ const createLencolProntaEntrega = async (req, res) => {
             !req.body.cor ||
             !req.body.tamanho
         ) {
-            res.send('Preencha todos os campos');
+            return res
+                .status(400)
+                .json({ message: 'Preencha todos os campos' });
         }
         // Extrai os dados do corpo da requisição
         const { codigo, imagem, quantidade, cor, tamanho } = req.body;

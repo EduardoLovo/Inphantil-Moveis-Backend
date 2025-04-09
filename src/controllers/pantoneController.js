@@ -47,7 +47,9 @@ const createPantone = async (req, res) => {
             !req.body.estoque ||
             !req.body.cor
         ) {
-            res.send('Preencha todos os campos');
+            return res
+                .status(400)
+                .json({ message: 'Preencha todos os campos' });
         }
         // Extrai os dados do corpo da requisição
         const { codigo, imagem, estoque, cor } = req.body;

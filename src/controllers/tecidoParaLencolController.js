@@ -48,7 +48,9 @@ const createTecidoParaLencol = async (req, res) => {
             !req.body.quantidade ||
             !req.body.estoque
         ) {
-            res.send('Preencha todos os campos');
+            return res
+                .status(400)
+                .json({ message: 'Preencha todos os campos' });
         }
         // Extrai os dados do corpo da requisição
         const { cor, quantidade, estoque, imagem } = req.body;
