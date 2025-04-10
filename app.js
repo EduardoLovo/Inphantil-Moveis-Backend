@@ -11,19 +11,37 @@ const authRoutes = require('./src/routes/auth.routes.js');
 const app = express();
 const port = 3000;
 
+// app.use(
+//     cors({
+//         origin: [
+//             'https://inphantil-moveis.vercel.app',
+//             'http://localhost:3000',
+//             'http://localhost:3001',
+//         ],
+//         methods: ['GET', 'POST', 'PATCH', 'DELETE'], // Métodos permitidos
+//         allowedHeaders: ['Content-Type', 'Authorization'], // Headers permitidos
+//     })
+// );
+
+const allowedOrigins = [
+    // 'http://localhost:3000',
+    // 'http://localhost:3001',
+    'https://inphantil-moveis.vercel.app',
+];
+
 app.use(
     cors({
-        origin: [
-            'https://inphantil-moveis.vercel.app',
-            'http://localhost:3000',
-            'http://localhost:3001',
-        ],
-        methods: ['GET', 'POST', 'PATCH', 'DELETE'], // Métodos permitidos
-        allowedHeaders: ['Content-Type', 'Authorization'], // Headers permitidos
+        origin: function (origin, callback) {
+            if (!origin || allowedOrigins.includes(origin)) {
+                callback(null, true);
+            } else {
+                callback(new Error('Not allowed by CORS'));
+            }
+        },
+        methods: ['GET', 'POST', 'PATCH', 'DELETE'],
+        allowedHeaders: ['Content-Type', 'Authorization'],
     })
 );
-// Adiciona o handler para OPTIONS antes de qualquer rota
-app.options('*', cors());
 // Middleware para processar JSON
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
