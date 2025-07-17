@@ -40,29 +40,64 @@ const getApliqueById = async (req, res) => {
 // Função para criar um novo aplique no banco de dados
 const createAplique = async (req, res) => {
     try {
-        // Verifica se todos os campos obrigatórios foram preenchidos na requisição
-        if (
-            !req.body.codigo ||
-            !req.body.imagem ||
-            !req.body.quantidade ||
-            !req.body.estoque ||
-            !req.body.ordem
-        ) {
-            return res
-                .status(400)
-                .json({ message: 'Preencha todos os campos' });
-        }
-        // Extrai os dados do corpo da requisição
+        const errors = [];
+
         const { codigo, imagem, quantidade, estoque, ordem } = req.body;
 
+        // codigo (string)
+        if (codigo == null || typeof codigo !== 'string' || !codigo.trim()) {
+            errors.push('codigo');
+        }
+
+        // imagem (string - supondo URL/caminho)
+        if (imagem == null || typeof imagem !== 'string' || !imagem.trim()) {
+            errors.push('imagem');
+        }
+
+        // quantidade (número inteiro >= 0? ajuste se quiser)
+        const qtdNum = Number(quantidade);
+        if (
+            quantidade == null ||
+            Number.isNaN(qtdNum) ||
+            !Number.isFinite(qtdNum) ||
+            qtdNum < 0 // remova se quiser permitir negativo
+        ) {
+            errors.push('quantidade');
+        }
+
+        // estoque (boolean) — aceite true ou false; se vier string, converta?
+        // Aqui: obrigatório e deve ser boolean já parseado. Se vier string, converta com cuidado.
+        if (estoque == null || typeof estoque !== 'boolean') {
+            errors.push('estoque');
+        }
+
+        // ordem (número inteiro? obrigatório)
+        const ordemNum = Number(ordem);
+        if (
+            ordem == null ||
+            Number.isNaN(ordemNum) ||
+            !Number.isFinite(ordemNum)
+        ) {
+            errors.push('ordem');
+        }
+
+        if (errors.length > 0) {
+            return res.status(400).json({
+                message: 'Campos obrigatórios faltando ou inválidos.',
+                fields: errors,
+            });
+        }
+
         // Verifica se o código já existe no banco
-        const apliqueExistente = await Apliques.findOne({ codigo });
+        const apliqueExistente = await Apliques.findOne({
+            codigo: codigo.trim(),
+        });
         if (apliqueExistente) {
             return res.status(400).json({ message: 'Código já cadastrado' });
         }
 
         const novoAplique = await Apliques.create({
-            cor,
+            codigo,
             imagem,
             quantidade,
             estoque,

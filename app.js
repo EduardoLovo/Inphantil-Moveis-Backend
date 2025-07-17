@@ -10,18 +10,8 @@ const authRoutes = require('./src/routes/auth.routes.js');
 
 const app = express();
 const port = 3000;
-
-// app.use(
-//     cors({
-//         origin: [
-//             'https://inphantil-moveis.vercel.app',
-//             'http://localhost:3000',
-//             'http://localhost:3001',
-//         ],
-//         methods: ['GET', 'POST', 'PATCH', 'DELETE'], // Métodos permitidos
-//         allowedHeaders: ['Content-Type', 'Authorization'], // Headers permitidos
-//     })
-// );
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 const allowedOrigins = [
     // 'http://localhost:3000',
@@ -42,9 +32,6 @@ app.use(
         allowedHeaders: ['Content-Type', 'Authorization'],
     })
 );
-// Middleware para processar JSON
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
 // Open Route - Public Route
 app.get('/', (req, res) => {
