@@ -14,9 +14,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 const allowedOrigins = [
-    // 'http://localhost:3000',
-    // 'http://localhost:3001',
+    'http://localhost:3000',
+    'http://localhost:3001',
     'https://inphantil-moveis.vercel.app',
+    'https://www.inphantil-moveis.vercel.app', // se houver redirecionamento
 ];
 
 app.use(
