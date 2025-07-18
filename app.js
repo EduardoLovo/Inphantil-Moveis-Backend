@@ -11,38 +11,38 @@ const authRoutes = require('./src/routes/auth.routes.js');
 const app = express();
 const port = 3000;
 
-// const allowedOrigins = [
-//     'http://localhost:3000',
-//     'http://localhost:3001',
-//     'https://inphantil-moveis.vercel.app',
-//     'https://www.inphantil-moveis.vercel.app',
-// ];
+const allowedOrigins = [
+    'http://localhost:3000',
+    'http://localhost:3001',
+    'https://inphantil-moveis.vercel.app',
+    'https://www.inphantil-moveis.vercel.app',
+];
 
-app.use(cors());
+// app.use(cors());
 
 /**
  * Normaliza e decide se o origin é permitido.
  */
-// function isAllowedOrigin(origin) {
-//     if (!origin) return true; // sem origin (curl, Postman, SSR) -> permitir
-//     // remove barra final se houver
-//     const normalized = origin.replace(/\/+$/, '');
-//     return allowedOrigins.includes(normalized);
-// }
+function isAllowedOrigin(origin) {
+    if (!origin) return true; // sem origin (curl, Postman, SSR) -> permitir
+    // remove barra final se houver
+    const normalized = origin.replace(/\/+$/, '');
+    return allowedOrigins.includes(normalized);
+}
 
-// app.use(
-//     cors({
-//         origin(origin, callback) {
-//             if (isAllowedOrigin(origin)) {
-//                 return callback(null, true);
-//             }
-//             return callback(new Error(`Not allowed by CORS: ${origin}`));
-//         },
-//         methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
-//         allowedHeaders: ['Content-Type', 'Authorization'],
-//         credentials: true, // ative se você usa cookies/autenticação baseada em sessão
-//     })
-// );
+app.use(
+    cors({
+        origin(origin, callback) {
+            if (isAllowedOrigin(origin)) {
+                return callback(null, true);
+            }
+            return callback(new Error(`Not allowed by CORS: ${origin}`));
+        },
+        methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
+        allowedHeaders: ['Content-Type', 'Authorization'],
+        credentials: true, // ative se você usa cookies/autenticação baseada em sessão
+    })
+);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
