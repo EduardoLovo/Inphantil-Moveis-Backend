@@ -1,5 +1,43 @@
 const Apliques = require('../models/Apliques');
 
+// Converte valores vindos do front (string/boolean/etc.) para boolean real
+function toBoolean(val) {
+    if (typeof val === 'boolean') return val;
+    if (typeof val === 'string') {
+        const v = val.trim().toLowerCase();
+        if (['true', '1', 'sim', 'yes'].includes(v)) return true;
+        if (['false', '0', 'nao', 'não', 'no'].includes(v)) return false;
+    }
+    return undefined; // sinaliza inválido
+}
+
+// Converte número (string/number) em number; retorna undefined se inválido
+function toNumber(val) {
+    if (typeof val === 'number' && Number.isFinite(val)) return val;
+    if (typeof val === 'string' && val.trim() !== '') {
+        const n = Number(val);
+        if (!Number.isNaN(n) && Number.isFinite(n)) return n;
+    }
+    return undefined;
+}
+
+// Garante string não vazia ou undefined
+function toStringSafe(val) {
+    if (typeof val === 'string') {
+        const t = val.trim();
+        return t.length ? t : undefined;
+    }
+    return undefined;
+}
+
+// Log enxuto (ligue/desligue por env var)
+function debugLog(...args) {
+    if (process.env.DEBUG_APLIQUES === 'true') {
+        console.log('[APLIQUES]', ...args);
+    }
+}
+
+/* ------------------------------ GET ALL ------------------------------ */
 // Função para obter todos os apliques do banco de dados
 const getAllApliques = async (req, res) => {
     try {
@@ -13,6 +51,7 @@ const getAllApliques = async (req, res) => {
     }
 };
 
+/* ------------------------------ GET BY ID ------------------------------ */
 // Função para obter um aplique por ID
 const getApliqueById = async (req, res) => {
     try {
@@ -37,65 +76,50 @@ const getApliqueById = async (req, res) => {
     }
 };
 
-// Função para criar um novo aplique no banco de dados
+/* ------------------------------ CREATE ------------------------------ */
 const createAplique = async (req, res) => {
+    debugLog('REQ BODY (create):', req.body, {
+        types: {
+            codigo: typeof req.body.codigo,
+            imagem: typeof req.body.imagem,
+            quantidade: typeof req.body.quantidade,
+            estoque: typeof req.body.estoque,
+            ordem: typeof req.body.ordem,
+        },
+    });
+
     try {
-        const errors = [];
+        // Coerção
+        const codigo = toStringSafe(req.body.codigo);
+        const imagem = toStringSafe(req.body.imagem);
+        const quantidade = toNumber(req.body.quantidade);
+        const ordem = toNumber(req.body.ordem);
+        const estoque = toBoolean(req.body.estoque);
 
-        const { codigo, imagem, quantidade, estoque, ordem } = req.body;
+        // Validação
+        const errors = {};
+        if (codigo == null) errors.codigo = 'Código é obrigatório (string).';
+        if (imagem == null) errors.imagem = 'Imagem é obrigatória (string).';
+        if (quantidade == null) errors.quantidade = 'Quantidade inválida.';
+        if (ordem == null) errors.ordem = 'Ordem inválida.';
+        if (estoque == null)
+            errors.estoque = 'Estoque deve ser boolean (true/false).';
 
-        // codigo (string)
-        if (codigo == null || typeof codigo !== 'string' || !codigo.trim()) {
-            errors.push('codigo');
-        }
-
-        // imagem (string - supondo URL/caminho)
-        if (imagem == null || typeof imagem !== 'string' || !imagem.trim()) {
-            errors.push('imagem');
-        }
-
-        // quantidade (número inteiro >= 0? ajuste se quiser)
-        const qtdNum = Number(quantidade);
-        if (
-            quantidade == null ||
-            Number.isNaN(qtdNum) ||
-            !Number.isFinite(qtdNum) ||
-            qtdNum < 0 // remova se quiser permitir negativo
-        ) {
-            errors.push('quantidade');
-        }
-
-        // estoque (boolean) — aceite true ou false; se vier string, converta?
-        // Aqui: obrigatório e deve ser boolean já parseado. Se vier string, converta com cuidado.
-        if (estoque == null || typeof estoque !== 'boolean') {
-            errors.push('estoque');
-        }
-
-        // ordem (número inteiro? obrigatório)
-        const ordemNum = Number(ordem);
-        if (
-            ordem == null ||
-            Number.isNaN(ordemNum) ||
-            !Number.isFinite(ordemNum)
-        ) {
-            errors.push('ordem');
-        }
-
-        if (errors.length > 0) {
+        if (Object.keys(errors).length > 0) {
             return res.status(400).json({
                 message: 'Campos obrigatórios faltando ou inválidos.',
                 fields: errors,
             });
         }
 
-        // Verifica se o código já existe no banco
-        const apliqueExistente = await Apliques.findOne({
-            codigo: codigo.trim(),
-        });
-        if (apliqueExistente) {
-            return res.status(400).json({ message: 'Código já cadastrado' });
+        // Verificar duplicidade
+        const existente = await Apliques.findOne({ codigo });
+        if (existente) {
+            // Use 409 para conflito (recomendado); mude p/ 400 se preferir manter compatibilidade
+            return res.status(409).json({ message: 'Código já cadastrado' });
         }
 
+        // Criar
         const novoAplique = await Apliques.create({
             codigo,
             imagem,
@@ -104,20 +128,20 @@ const createAplique = async (req, res) => {
             ordem,
         });
 
-        // Retorna uma resposta de sucesso
-        res.status(201).json({
+        return res.status(201).json({
             message: 'Aplique adicionado com sucesso',
             data: novoAplique,
         });
     } catch (error) {
-        // Em caso de erro, retorna um erro 500 com a mensagem
-        res.status(500).json({
+        console.error('Erro ao criar aplique:', error);
+        return res.status(500).json({
             message: 'Erro ao criar aplique',
             error: error.message,
         });
     }
 };
 
+/* ------------------------------ UPDATE ------------------------------ */
 // Função para atualizar um aplique
 const updateAplique = async (req, res) => {
     try {
@@ -194,6 +218,7 @@ const updateAplique = async (req, res) => {
     }
 };
 
+/* ------------------------------ DELETE ------------------------------ */
 // Função para deletar um aplique
 const deleteAplique = async (req, res) => {
     try {
