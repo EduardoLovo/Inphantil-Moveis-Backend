@@ -78,48 +78,22 @@ const getApliqueById = async (req, res) => {
 
 /* ------------------------------ CREATE ------------------------------ */
 const createAplique = async (req, res) => {
-    debugLog('REQ BODY (create):', req.body, {
-        types: {
-            codigo: typeof req.body.codigo,
-            imagem: typeof req.body.imagem,
-            quantidade: typeof req.body.quantidade,
-            estoque: typeof req.body.estoque,
-            ordem: typeof req.body.ordem,
-        },
-    });
-
     try {
-        // Coerção
-        const codigo = toStringSafe(req.body.codigo);
-        const imagem = toStringSafe(req.body.imagem);
-        const quantidade = toNumber(req.body.quantidade);
-        const ordem = toNumber(req.body.ordem);
-        const estoque = toBoolean(req.body.estoque);
+        const { codigo, quantidade, estoque, imagem, ordem } = req.body;
 
-        // Validação
-        const errors = {};
-        if (codigo == null) errors.codigo = 'Código é obrigatório (string).';
-        if (imagem == null) errors.imagem = 'Imagem é obrigatória (string).';
-        if (quantidade == null) errors.quantidade = 'Quantidade inválida.';
-        if (ordem == null) errors.ordem = 'Ordem inválida.';
-        if (estoque == null)
-            errors.estoque = 'Estoque deve ser boolean (true/false).';
-
-        if (Object.keys(errors).length > 0) {
-            return res.status(400).json({
-                message: 'Campos obrigatórios faltando ou inválidos.',
-                fields: errors,
-            });
+        // Verifica se todos os campos obrigatórios foram preenchidos
+        if (
+            codigo === undefined ||
+            imagem === undefined ||
+            quantidade === undefined ||
+            estoque === undefined ||
+            ordem === undefined
+        ) {
+            return res
+                .status(400)
+                .json({ message: 'Preencha todos os campos' });
         }
 
-        // Verificar duplicidade
-        const existente = await Apliques.findOne({ codigo });
-        if (existente) {
-            // Use 409 para conflito (recomendado); mude p/ 400 se preferir manter compatibilidade
-            return res.status(409).json({ message: 'Código já cadastrado' });
-        }
-
-        // Criar
         const novoAplique = await Apliques.create({
             codigo,
             imagem,
@@ -128,13 +102,14 @@ const createAplique = async (req, res) => {
             ordem,
         });
 
-        return res.status(201).json({
+        // Retorna uma resposta de sucesso
+        res.status(201).json({
             message: 'Aplique adicionado com sucesso',
             data: novoAplique,
         });
     } catch (error) {
-        console.error('Erro ao criar aplique:', error);
-        return res.status(500).json({
+        // Em caso de erro, retorna um erro 500 com a mensagem
+        res.status(500).json({
             message: 'Erro ao criar aplique',
             error: error.message,
         });
