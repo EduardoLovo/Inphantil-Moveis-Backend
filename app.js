@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const serverless = require('serverless-http');
 const connectToDatabase = require('./src/config/db.js'); // Importa a função do db.js
 const apliquesRouter = require('./src/routes/apliques.routes.js'); // Importa as rotas de apliques
 const lencolProntaEntregaRouter = require('./src/routes/lencolProntaEntrega.routes.js'); // Importa as rotas de apliques
@@ -68,4 +69,4 @@ app.listen(port, () => {
     console.log(`Servidor rodando em http://localhost:${port}`);
 });
 
-module.exports = app;
+module.exports = serverless(app);
