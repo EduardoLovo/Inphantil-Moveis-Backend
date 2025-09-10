@@ -25,10 +25,11 @@ async function connectToDatabase() {
 
         // Adicione opções de conexão para melhor performance
         const opts = {
-            bufferCommands: false, // Desativa buffering de comandos
-            maxPoolSize: 10, // Limite de conexões no pool
-            serverSelectionTimeoutMS: 5000, // Timeout de 5 seg para seleção do servidor
-            socketTimeoutMS: 45000, // Timeout de 45 seg para sockets
+            bufferCommands: false,
+            maxPoolSize: 5, // Reduzir o pool
+            serverSelectionTimeoutMS: 3000, // 3 segundos
+            socketTimeoutMS: 5000, // 5 segundos
+            connectTimeoutMS: 3000, // 3 segundos
         };
 
         cached.promise = mongoose
