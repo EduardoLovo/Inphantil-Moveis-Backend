@@ -10,7 +10,7 @@ const pantoneRouter = require('./src/routes/pantone.routes.js');
 const authRoutes = require('./src/routes/auth.routes.js');
 
 const app = express();
-const port = 3000;
+// const port = 3000;
 
 const allowedOrigins = [
     'http://localhost:3000',
@@ -65,8 +65,8 @@ app.use('/pantone', pantoneRouter);
 connectToDatabase();
 
 // Inicia o servidor e exibe uma mensagem no console com a URL onde ele está rodando
-app.listen(port, () => {
-    console.log(`Servidor rodando em http://localhost:${port}`);
-});
+// app.listen(port, () => {
+//     console.log(`Servidor rodando em http://localhost:${port}`);
+// });
 
 module.exports = serverless(app);
