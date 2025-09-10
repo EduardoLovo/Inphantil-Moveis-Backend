@@ -4,7 +4,7 @@ if (process.env.NODE_ENV !== 'production') {
 
 const mongoose = require('mongoose');
 
-// Cache global (importante para Vercel serverless)
+// Cache global para a conexão
 let cached = global.mongoose;
 
 if (!cached) {
@@ -13,7 +13,7 @@ if (!cached) {
 
 async function connectToDatabase() {
     if (cached.conn) {
-        // Já existe conexão ativa
+        // Conexão já existe, retorna ela
         return cached.conn;
     }
 
@@ -21,12 +21,18 @@ async function connectToDatabase() {
         const dbUser = process.env.DB_USER;
         const dbPass = process.env.DB_PASS;
 
-        const MONGODB_URI = `mongodb+srv://${dbUser}:${dbPass}@cluster0.9qskv.mongodb.net/Inphantil`;
+        const MONGODB_URI = `mongodb+srv://${dbUser}:${dbPass}@cluster0.9qskv.mongodb.net/Inphantil?retryWrites=true&w=majority`;
+
+        // Adicione opções de conexão para melhor performance
+        const opts = {
+            bufferCommands: false, // Desativa buffering de comandos
+            maxPoolSize: 10, // Limite de conexões no pool
+            serverSelectionTimeoutMS: 5000, // Timeout de 5 seg para seleção do servidor
+            socketTimeoutMS: 45000, // Timeout de 45 seg para sockets
+        };
 
         cached.promise = mongoose
-            .connect(MONGODB_URI, {
-                bufferCommands: false, // evita problemas em serverless
-            })
+            .connect(MONGODB_URI, opts)
             .then((mongoose) => {
                 return mongoose;
             });
