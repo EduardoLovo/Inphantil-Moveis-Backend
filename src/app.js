@@ -12,6 +12,8 @@ const authRoutes = require('./routes/auth.routes.js');
 
 const app = express();
 
+const PORT = 3000;
+
 const allowedOrigins = [
     'http://localhost:3000',
     'http://localhost:3001',
@@ -47,5 +49,9 @@ app.use('/lencol-pronta-entrega', lencolProntaEntregaRouter);
 app.use('/tecido-para-lencol', tecidoParaLencolRouter);
 app.use('/sintetico', sinteticoRouter);
 app.use('/pantone', pantoneRouter);
+
+app.listen(PORT, () => {
+    console.log(`Servidor rodando em http://localhost:${PORT}`);
+});
 
 module.exports = app;
