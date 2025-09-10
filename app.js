@@ -18,11 +18,6 @@ const allowedOrigins = [
     'https://www.inphantil-moveis.vercel.app',
 ];
 
-// app.use(cors());
-
-/**
- * Normaliza e decide se o origin é permitido.
- */
 function isAllowedOrigin(origin) {
     if (!origin) return true; // sem origin (curl, Postman, SSR) -> permitir
     // remove barra final se houver
@@ -44,7 +39,7 @@ app.use(
     })
 );
 
-app.options('*', cors());
+// app.options('*', cors());
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

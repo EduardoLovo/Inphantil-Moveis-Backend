@@ -102,6 +102,7 @@ const createAplique = async (req, res) => {
             ordem,
         });
 
+
         // Retorna uma resposta de sucesso
         res.status(201).json({
             message: 'Aplique adicionado com sucesso',
