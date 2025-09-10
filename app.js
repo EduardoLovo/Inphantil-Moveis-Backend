@@ -19,27 +19,12 @@ const allowedOrigins = [
     'https://www.inphantil-moveis.vercel.app',
 ];
 
-app.use((req, res, next) => {
-    const origin = req.headers.origin;
-    if (allowedOrigins.includes(origin)) {
-        res.setHeader('Access-Control-Allow-Origin', origin);
-    }
-    res.setHeader(
-        'Access-Control-Allow-Methods',
-        'GET,POST,PATCH,DELETE,OPTIONS'
-    );
-    res.setHeader(
-        'Access-Control-Allow-Headers',
-        'Content-Type, Authorization'
-    );
-    res.setHeader('Access-Control-Allow-Credentials', 'true');
-
-    if (req.method === 'OPTIONS') {
-        return res.sendStatus(204);
-    }
-
-    next();
-});
+const corsOptions = {
+    origin: allowedOrigins,
+    methods: 'GET,POST,PATCH,DELETE,OPTIONS',
+    credentials: true,
+};
+app.use(cors(corsOptions));
 
 // app.options('*', cors());
 
