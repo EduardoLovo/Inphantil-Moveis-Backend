@@ -40,17 +40,18 @@ const getPantoneById = async (req, res) => {
 // Função para criar um novo pantone no banco de dados
 const createPantone = async (req, res) => {
     try {
-        // Verifica se todos os campos obrigatórios foram preenchidos na requisição
+        // Verifica se todos os campos obrigatórios foram preenchidos
         if (
-            !req.body.codigo ||
-            !req.body.imagem ||
-            !req.body.estoque ||
-            !req.body.cor
+            codigo === undefined ||
+            imagem === undefined ||
+            cor === undefined ||
+            estoque === undefined
         ) {
             return res
                 .status(400)
                 .json({ message: 'Preencha todos os campos' });
         }
+
         // Extrai os dados do corpo da requisição
         const { codigo, imagem, estoque, cor } = req.body;
 

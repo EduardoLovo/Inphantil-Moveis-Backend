@@ -42,12 +42,12 @@ const getSinteticoById = async (req, res) => {
 // Função para criar um novo sintetico no banco de dados
 const createSintetico = async (req, res) => {
     try {
-        // Verifica se todos os campos obrigatórios foram preenchidos na requisição
+        // Verifica se todos os campos obrigatórios foram preenchidos
         if (
-            !req.body.codigo ||
-            !req.body.imagem ||
-            !req.body.estoque ||
-            !req.body.cor
+            codigo === undefined ||
+            imagem === undefined ||
+            cor === undefined ||
+            estoque === undefined
         ) {
             return res
                 .status(400)

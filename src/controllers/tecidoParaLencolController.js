@@ -41,17 +41,18 @@ const getTecidoParaLencolById = async (req, res) => {
 // Função para criar um novo tecido no banco de dados
 const createTecidoParaLencol = async (req, res) => {
     try {
-        // Verifica se todos os campos obrigatórios foram preenchidos na requisição
+        // Verifica se todos os campos obrigatórios foram preenchidos
         if (
-            !req.body.cor ||
-            !req.body.imagem ||
-            !req.body.quantidade ||
-            !req.body.estoque
+            cor === undefined ||
+            imagem === undefined ||
+            quantidade === undefined ||
+            estoque === undefined
         ) {
             return res
                 .status(400)
                 .json({ message: 'Preencha todos os campos' });
         }
+
         // Extrai os dados do corpo da requisição
         const { cor, quantidade, estoque, imagem } = req.body;
 

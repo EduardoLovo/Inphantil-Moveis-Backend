@@ -40,18 +40,19 @@ const getLencolProntaEntregaById = async (req, res) => {
 // Função para criar um novo lençol no banco de dados
 const createLencolProntaEntrega = async (req, res) => {
     try {
-        // Verifica se todos os campos obrigatórios foram preenchidos na requisição
+        // Verifica se todos os campos obrigatórios foram preenchidos
         if (
-            !req.body.codigo ||
-            !req.body.imagem ||
-            !req.body.quantidade ||
-            !req.body.cor ||
-            !req.body.tamanho
+            codigo === undefined ||
+            imagem === undefined ||
+            quantidade === undefined ||
+            cor === undefined ||
+            tamanho === undefined
         ) {
             return res
                 .status(400)
                 .json({ message: 'Preencha todos os campos' });
         }
+
         // Extrai os dados do corpo da requisição
         const { codigo, imagem, quantidade, cor, tamanho } = req.body;
 
