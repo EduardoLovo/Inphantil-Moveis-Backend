@@ -19,24 +19,21 @@ const allowedOrigins = [
     'https://www.inphantil-moveis.vercel.app',
 ];
 
-function isAllowedOrigin(origin) {
-    if (!origin) return true; // sem origin (curl, Postman, SSR) -> permitir
-    // remove barra final se houver
-    const normalized = origin.replace(/\/+$/, '');
-    return allowedOrigins.includes(normalized);
-}
-
 app.use(
     cors({
-        origin(origin, callback) {
-            if (isAllowedOrigin(origin)) {
-                return callback(null, true);
+        origin: (origin, callback) => {
+            if (
+                !origin ||
+                allowedOrigins.includes(origin.replace(/\/+$/, ''))
+            ) {
+                callback(null, true);
+            } else {
+                callback(new Error(`Not allowed by CORS: ${origin}`));
             }
-            return callback(new Error(`Not allowed by CORS: ${origin}`));
         },
         methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
         allowedHeaders: ['Content-Type', 'Authorization'],
-        credentials: true, // ative se você usa cookies/autenticação baseada em sessão
+        credentials: true,
     })
 );
 
