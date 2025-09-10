@@ -10,7 +10,7 @@ const pantoneRouter = require('./src/routes/pantone.routes.js');
 const authRoutes = require('./src/routes/auth.routes.js');
 
 const app = express();
-const port = 3000;
+// const port = 3000;
 
 const allowedOrigins = [
     'http://localhost:3000',
@@ -25,24 +25,22 @@ const corsOptions = {
     credentials: true,
 };
 app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 
 // app.options('*', cors());
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+// Conectar só uma vez na inicialização
+// Conecta uma única vez ao iniciar o app
+connectToDatabase()
+    .then(() => console.log('✅ Conectado ao banco de dados!'))
+    .catch((err) => {
+        console.error('❌ Erro ao conectar ao banco:', err);
+        process.exit(1); // Encerra se não conseguir conectar
+    });
 
-app.use(async (req, res, next) => {
-    try {
-        await connectToDatabase();
-        next();
-    } catch (error) {
-        console.error('Falha ao conectar com o banco de dados:', error);
-        res.status(500).json({
-            msg: 'Erro interno do servidor',
-            error: error.message,
-        });
-    }
-});
+// Não precisa mais await connectToDatabase() em cada request
 
 // Open Route - Public Route
 app.get('/', (req, res) => {
@@ -61,8 +59,8 @@ app.use('/sintetico', sinteticoRouter);
 app.use('/pantone', pantoneRouter);
 
 // Inicia o servidor e exibe uma mensagem no console com a URL onde ele está rodando
-app.listen(port, () => {
-    console.log(`Servidor rodando em http://localhost:${port}`);
-});
+// app.listen(port, () => {
+//     console.log(`Servidor rodando em http://localhost:${port}`);
+// });
 
 module.exports = serverless(app);
