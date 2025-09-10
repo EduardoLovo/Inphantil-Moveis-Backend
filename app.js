@@ -42,7 +42,6 @@ app.get('/', (req, res) => {
 
 // Rotas
 app.use('/', authRoutes);
-app.use('/uploads', express.static('uploads'));
 app.use('/aplique', apliquesRouter);
 app.use('/lencol-pronta-entrega', lencolProntaEntregaRouter);
 app.use('/tecido-para-lencol', tecidoParaLencolRouter);

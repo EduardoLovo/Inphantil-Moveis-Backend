@@ -1,5 +1,4 @@
 const TecidoParaLencol = require('../models/TecidoParaLencol');
-const cloudinary = require('../config/cloudinaryConfig'); // Importe o Cloudinary
 
 // Função para obter todos os tecido do banco de dados
 const getAllTecidoParaLencol = async (req, res) => {

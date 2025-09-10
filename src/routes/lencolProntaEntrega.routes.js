@@ -1,5 +1,4 @@
 const routes = require('express').Router();
-const upload = require('../config/uploadConfig'); // Importa a configuração do multer
 const LencolProntaEntregaController = require('../controllers/lencolProntaEntregaController'); // Importa o modelo
 const authMiddleware = require('../middlewares/authMiddleware');
 

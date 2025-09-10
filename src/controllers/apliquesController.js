@@ -1,42 +1,5 @@
 const Apliques = require('../models/Apliques');
 
-// // Converte valores vindos do front (string/boolean/etc.) para boolean real
-// function toBoolean(val) {
-//     if (typeof val === 'boolean') return val;
-//     if (typeof val === 'string') {
-//         const v = val.trim().toLowerCase();
-//         if (['true', '1', 'sim', 'yes'].includes(v)) return true;
-//         if (['false', '0', 'nao', 'não', 'no'].includes(v)) return false;
-//     }
-//     return undefined; // sinaliza inválido
-// }
-
-// // Converte número (string/number) em number; retorna undefined se inválido
-// function toNumber(val) {
-//     if (typeof val === 'number' && Number.isFinite(val)) return val;
-//     if (typeof val === 'string' && val.trim() !== '') {
-//         const n = Number(val);
-//         if (!Number.isNaN(n) && Number.isFinite(n)) return n;
-//     }
-//     return undefined;
-// }
-
-// // Garante string não vazia ou undefined
-// function toStringSafe(val) {
-//     if (typeof val === 'string') {
-//         const t = val.trim();
-//         return t.length ? t : undefined;
-//     }
-//     return undefined;
-// }
-
-// // Log enxuto (ligue/desligue por env var)
-// function debugLog(...args) {
-//     if (process.env.DEBUG_APLIQUES === 'true') {
-//         console.log('[APLIQUES]', ...args);
-//     }
-// }
-
 /* ------------------------------ GET ALL ------------------------------ */
 // Função para obter todos os apliques do banco de dados
 const getAllApliques = async (req, res) => {
@@ -101,7 +64,6 @@ const createAplique = async (req, res) => {
             estoque,
             ordem,
         });
-
 
         // Retorna uma resposta de sucesso
         res.status(201).json({
