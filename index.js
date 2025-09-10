@@ -1,5 +1,5 @@
 const serverless = require('serverless-http');
-const app = require('../src/app');
+const app = require('./src/app.js');
 
 // Wrap com timeout de 9 segundos (para evitar o limite de 10s da Vercel)
 const handler = serverless(app);

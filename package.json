@@ -4,8 +4,8 @@
     "description": "",
     "main": "app.js",
     "scripts": {
-        "start": "node api/index.js",
-        "dev": "nodemon api/index.js",
+        "start": "node index.js",
+        "dev": "nodemon index.js",
         "build": "echo 'No build needed for Node.js serverless'"
     },
     "keywords": [],
