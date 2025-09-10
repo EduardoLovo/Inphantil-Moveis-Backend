@@ -1,8 +1,8 @@
 const express = require('express');
 const cors = require('cors');
-const serverless = require('serverless-http');
 const connectToDatabase = require('./src/config/db.js');
 
+// Importa as rotas
 const apliquesRouter = require('./src/routes/apliques.routes.js');
 const lencolProntaEntregaRouter = require('./src/routes/lencolProntaEntrega.routes.js');
 const tecidoParaLencolRouter = require('./src/routes/tecidoParaLencol.routes.js');
@@ -12,7 +12,6 @@ const authRoutes = require('./src/routes/auth.routes.js');
 
 const app = express();
 
-// 🌍 CORS
 const allowedOrigins = [
     'http://localhost:3000',
     'http://localhost:3001',
@@ -21,42 +20,35 @@ const allowedOrigins = [
 ];
 
 const corsOptions = {
-    origin: (origin, callback) => {
-        if (!origin || allowedOrigins.includes(origin)) {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
+    origin: allowedOrigins,
     methods: 'GET,POST,PATCH,DELETE,OPTIONS',
     credentials: true,
 };
-app.use(cors(corsOptions));
-app.options('*', cors(corsOptions)); // ✅ preflight
 
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// 🔌 Conecta ao banco somente uma vez por instância
+// conecta com o banco (uma vez por invocação)
 connectToDatabase()
-    .then(() => console.log('🚀 Banco conectado!'))
-    .catch((err) => {
-        console.error('❌ Erro ao conectar ao banco:', err);
-    });
+    .then(() => console.log('✅ Conectado ao banco de dados!'))
+    .catch((err) => console.error('❌ Erro ao conectar ao banco:', err));
 
-// 🌐 Rotas
+// Rota pública
 app.get('/', (req, res) => {
     res.status(200).json({ msg: 'Inphantil Moveis API!' });
 });
 
+// Rotas
 app.use('/', authRoutes);
 app.use('/uploads', express.static('uploads'));
-
 app.use('/aplique', apliquesRouter);
 app.use('/lencol-pronta-entrega', lencolProntaEntregaRouter);
 app.use('/tecido-para-lencol', tecidoParaLencolRouter);
 app.use('/sintetico', sinteticoRouter);
 app.use('/pantone', pantoneRouter);
 
-// 🔄 Exporta como função serverless (para Vercel)
+// ⚠️ Não usar app.listen aqui!
+// Apenas exporta
 module.exports = app;

@@ -4,38 +4,42 @@ if (process.env.NODE_ENV !== 'production') {
 
 const mongoose = require('mongoose');
 
-// Variável para armazenar a conexão do banco de dados em cache
-let cachedDb = null;
+// Cache global (importante para Vercel serverless)
+let cached = global.mongoose;
 
-// Credenciais
-const dbUser = process.env.DB_USER;
-const dbPass = process.env.DB_PASS;
+if (!cached) {
+    cached = global.mongoose = { conn: null, promise: null };
+}
 
 async function connectToDatabase() {
-    // Se já existe conexão aberta e ativa, usa ela
-    if (cachedDb && mongoose.connection.readyState === 1) {
-        console.log('📌 Usando conexão já existente');
-        return cachedDb;
+    if (cached.conn) {
+        // Já existe conexão ativa
+        return cached.conn;
+    }
+
+    if (!cached.promise) {
+        const dbUser = process.env.DB_USER;
+        const dbPass = process.env.DB_PASS;
+
+        const MONGODB_URI = `mongodb+srv://${dbUser}:${dbPass}@cluster0.9qskv.mongodb.net/Inphantil`;
+
+        cached.promise = mongoose
+            .connect(MONGODB_URI, {
+                bufferCommands: false, // evita problemas em serverless
+            })
+            .then((mongoose) => {
+                return mongoose;
+            });
     }
 
     try {
-        // Cria nova conexão
-        const db = await mongoose.connect(
-            `mongodb+srv://${dbUser}:${dbPass}@cluster0.9qskv.mongodb.net/`,
-            {
-                dbName: 'Inphantil',
-                useNewUrlParser: true,
-                useUnifiedTopology: true,
-            }
-        );
-
-        cachedDb = db;
-        console.log('✅ Conectado a um novo banco de dados');
-        return cachedDb;
-    } catch (err) {
-        console.error('❌ Erro ao conectar ao MongoDB:', err);
-        throw new Error('Falha na conexão do banco de dados.');
+        cached.conn = await cached.promise;
+    } catch (e) {
+        cached.promise = null;
+        throw e;
     }
+
+    return cached.conn;
 }
 
 module.exports = connectToDatabase;
