@@ -59,4 +59,4 @@ app.use('/sintetico', sinteticoRouter);
 app.use('/pantone', pantoneRouter);
 
 // 🔄 Exporta como função serverless (para Vercel)
-module.exports = serverless(app);
+module.exports = app;
