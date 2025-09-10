@@ -31,6 +31,19 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+app.use(async (req, res, next) => {
+    try {
+        await connectToDatabase();
+        next();
+    } catch (error) {
+        console.error('Falha ao conectar com o banco de dados:', error);
+        res.status(500).json({
+            msg: 'Erro interno do servidor',
+            error: error.message,
+        });
+    }
+});
+
 // Open Route - Public Route
 app.get('/', (req, res) => {
     res.status(200).json({ msg: 'Inphantil Moveis API!' });
@@ -46,9 +59,6 @@ app.use('/lencol-pronta-entrega', lencolProntaEntregaRouter);
 app.use('/tecido-para-lencol', tecidoParaLencolRouter);
 app.use('/sintetico', sinteticoRouter);
 app.use('/pantone', pantoneRouter);
-
-// Conecta ao banco de dados
-connectToDatabase();
 
 // Inicia o servidor e exibe uma mensagem no console com a URL onde ele está rodando
 // app.listen(port, () => {
